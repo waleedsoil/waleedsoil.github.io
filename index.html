@@ -3,93 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waleed Ramzan | Soil-to-Plant-to-Canopy Architect</title>
+    <title>Waleed Ramzan | TheSoilKid Architect</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@100;300;400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@200;300;400;600&family=JetBrains+Mono:wght@100;400;700&display=swap');
         
         :root { 
-            --bg-base: #09090b; /* Zinc 950 */
-            --bg-surface: #18181b; /* Zinc 900 */
-            --accent: #38bdf8; /* Sky 400 */
-            --accent-rgb: 56, 189, 248;
-            --text-main: #e4e4e7; /* Zinc 200 */
-            --text-muted: #a1a1aa; /* Zinc 400 */
+            --bg-deep: #050507; 
+            --bg-mid: #0a0f12; 
+            --bg-high: #0f171e; 
+            --text-main: #f8fafc;      
+            --accent-primary: #10b981; /* Emerald */
+            --accent-secondary: #0ea5e9; /* Sky/Cyan */
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-bg: rgba(10, 15, 18, 0.6);
         }
         
         body, html { 
             font-family: 'Inter', sans-serif; 
             color: var(--text-main); 
-            background-color: var(--bg-base);
             margin: 0; 
             overflow-x: hidden;
+            background: var(--bg-deep);
+            background-image: radial-gradient(circle at 50% 0%, var(--bg-high) 0%, var(--bg-deep) 70%);
+            background-attachment: fixed;
         }
         
+        .serif { font-family: 'Instrument Serif', serif; }
         .mono { font-family: 'JetBrains Mono', monospace; }
 
-        /* Cartesian Coordinate Grid Background */
-        .bg-grid {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background-size: 50px 50px;
-            background-image: 
-                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-            z-index: 0;
-            pointer-events: none;
+        /* Agritech Data Network Canvas */
+        #network-canvas {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 0; pointer-events: none; opacity: 0.85;
         }
 
-        /* Subtle Radial Vignette */
-        .vignette {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: radial-gradient(circle at 50% 50%, transparent 20%, var(--bg-base) 100%);
-            z-index: 1;
-            pointer-events: none;
+        /* Subtle Technical Grid Overlay */
+        .tech-grid {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-size: 60px 60px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+            z-index: 1; pointer-events: none; mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
         }
 
         /* Responsive Scroll Snapping */
         .snap-container { height: 100vh; overflow-y: scroll; overflow-x: hidden; scroll-snap-type: y mandatory; position: relative; z-index: 10; }
         .snap-section { min-height: 100vh; scroll-snap-align: start; display: flex; flex-direction: column; justify-content: center; position: relative; }
         
-        /* Modal & Scrollbar - Clinical & Clean */
-        .modal-glass { background: rgba(9, 9, 11, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        /* Glassmorphism UI */
+        .glass-panel { 
+            background: var(--glass-bg); 
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); 
+            border: 1px solid var(--glass-border); 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
         
+        /* Modals & Scrollbars */
+        .modal-glass { background: rgba(5, 5, 7, 0.95); backdrop-filter: blur(20px); }
         #modal-content-area::-webkit-scrollbar { width: 4px; }
-        #modal-content-area::-webkit-scrollbar-track { background: transparent; }
-        #modal-content-area::-webkit-scrollbar-thumb { background: rgba(var(--accent-rgb), 0.4); border-radius: 0px; }
+        #modal-content-area::-webkit-scrollbar-thumb { background: rgba(16, 185, 129, 0.5); border-radius: 4px; }
 
         /* Reveal Animations */
-        .reveal { opacity: 0; transform: translateY(20px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        .reveal { opacity: 0; transform: translateY(40px); transition: all 1s cubic-bezier(0.16, 1, 0.3, 1); }
         .reveal.active { opacity: 1; transform: translateY(0); }
         
-        /* Instrument Data Cards */
-        .data-card { 
-            background: rgba(24, 24, 27, 0.6); 
-            border: 1px solid rgba(255,255,255,0.05); 
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+        /* Interactive Cards */
+        .premium-card { transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); position: relative; overflow: hidden; }
+        .premium-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(16,185,129,0.1) 0%, transparent 100%);
+            opacity: 0; transition: opacity 0.5s ease;
         }
-        .data-card::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 2px; height: 100%;
-            background: var(--accent); transform: scaleY(0); transition: transform 0.3s ease; transform-origin: bottom;
-        }
-        .data-card:hover { 
-            background: rgba(24, 24, 27, 0.9); 
-            border-color: rgba(var(--accent-rgb), 0.3); 
-            transform: translateY(-2px);
-        }
-        .data-card:hover::before { transform: scaleY(1); }
-
-        /* Map Ping Animation */
-        @keyframes radar-ping { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(3); opacity: 0; } }
-        .animate-radar { animation: radar-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite; }
+        .premium-card:hover { transform: translateY(-8px); border-color: rgba(16, 185, 129, 0.4); box-shadow: 0 20px 40px -10px rgba(16, 185, 129, 0.15); }
+        .premium-card:hover::before { opacity: 1; }
         
-        /* Tailored Utilities */
-        .text-accent { color: var(--accent); }
-        .border-accent { border-color: var(--accent); }
-        .hover-text-accent:hover { color: var(--accent); }
+        /* Glows & Pings */
+        .glow-text { text-shadow: 0 0 20px rgba(16, 185, 129, 0.4); }
+        @keyframes ping-slow { 75%, 100% { transform: scale(2.5); opacity: 0; } }
+        .animate-ping-slow { animation: ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite; }
         
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -97,182 +90,218 @@
 </head>
 <body>
 
-    <div class="bg-grid"></div>
-    <div class="vignette"></div>
+    <canvas id="network-canvas"></canvas>
+    <div class="tech-grid"></div>
 
-    <nav class="fixed top-0 w-full z-50 flex justify-between items-center px-6 md:px-12 py-4 border-b border-white/5 bg-[#09090b]/80 backdrop-blur-md mono text-[10px] md:text-xs tracking-[0.2em] uppercase">
-        <div class="text-white font-bold tracking-widest">W.RAMZAN <span class="text-accent opacity-50 font-normal">v4.4-R1</span></div>
-        <div class="flex gap-6 md:gap-10">
-            <a href="#matrix" class="hover-text-accent transition duration-300">Matrix</a>
-            <a href="#logs" class="hover-text-accent transition duration-300">Logs</a>
-            <a href="#map" class="hover-text-accent transition duration-300">Nodes</a>
+    <nav class="fixed top-0 w-full z-50 flex justify-between items-center px-6 md:px-12 py-5 border-b border-white/5 bg-[#050507]/80 backdrop-blur-md mono text-[10px] md:text-xs tracking-[0.2em] uppercase">
+        <div class="text-white font-bold tracking-widest flex items-center gap-3">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            W.RAMZAN <span class="text-emerald-500/50">v4.4-R1</span>
+        </div>
+        <div class="hidden md:flex gap-10">
+            <a href="#hero" class="hover:text-emerald-400 transition duration-300">Init</a>
+            <a href="#science" class="hover:text-emerald-400 transition duration-300">Matrix</a>
+            <a href="#lens" class="hover:text-emerald-400 transition duration-300">Lens</a>
+            <a href="#map" class="hover:text-emerald-400 transition duration-300">Nodes</a>
         </div>
     </nav>
 
-    <div class="fixed z-[90] bottom-6 left-1/2 -translate-x-1/2 flex flex-row gap-4 p-2 bg-[#18181b]/80 backdrop-blur-md border border-white/10 rounded-none md:left-auto md:right-8 md:top-1/2 md:-translate-y-1/2 md:translate-x-0 md:flex-col md:bg-transparent md:border-none md:p-0 md:gap-6 md:backdrop-blur-none">
-        <a href="https://linkedin.com/in/waleedramzan" aria-label="LinkedIn" target="_blank" rel="noopener noreferrer" class="w-10 h-10 border border-white/10 flex items-center justify-center text-zinc-500 hover:text-accent hover:border-accent hover:bg-accent/10 transition-all duration-300">
+    <!-- Social Sidebar -->
+    <div class="fixed z-[90] bottom-6 left-1/2 -translate-x-1/2 flex flex-row gap-3 p-3 glass-panel rounded-full md:left-auto md:right-8 md:top-1/2 md:-translate-y-1/2 md:translate-x-0 md:flex-col md:rounded-2xl md:p-4 md:gap-6">
+        <a href="https://linkedin.com/in/waleedramzan" aria-label="LinkedIn" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:text-emerald-400 hover:border-emerald-400 hover:bg-emerald-400/10 transition-all duration-300">
             <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
         </a>
-        <a href="https://scholar.google.com/citations?user=Jm5Vp_oAAAAJ&hl=en" aria-label="Google Scholar" target="_blank" rel="noopener noreferrer" class="w-10 h-10 border border-white/10 flex items-center justify-center text-zinc-500 hover:text-accent hover:border-accent hover:bg-accent/10 transition-all duration-300">
+        <a href="https://scholar.google.com/citations?user=Jm5Vp_oAAAAJ&hl=en" aria-label="Google Scholar" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:text-emerald-400 hover:border-emerald-400 hover:bg-emerald-400/10 transition-all duration-300">
             <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 24a7 7 0 1 1 0-14 7 7 0 0 1 0 14zm0-24L0 9.5l4.838 2.735c-.078.435-.152.888-.152 1.411 0 2.923 2.196 5.568 5.615 6.784l-.841 1.543c-1.391-.122-2.827-.585-4.045-1.428l-1.071 1.706C5.975 23.363 8.761 24 12 24s6.025-.637 7.656-1.749l-1.071-1.706c-1.218.843-2.654 1.306-4.045 1.428l-.841-1.543c3.419-1.216 5.615-3.861 5.615-6.784 0-.523-.074-.976-.152-1.411L24 9.5 12 0z"/></svg>
+        </a>
+        <a href="https://www.instagram.com/thesoilkid" aria-label="Instagram" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:text-emerald-400 hover:border-emerald-400 hover:bg-emerald-400/10 transition-all duration-300">
+            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073z"/></svg>
         </a>
     </div>
 
     <div class="snap-container" id="main-scroll">
         
+        <!-- HERO -->
         <section id="hero" class="snap-section p-6 md:p-24 pt-28 md:pt-32 pb-24 md:pb-24">
-            <div class="max-w-5xl">
-                <div class="mono text-accent text-xs md:text-sm tracking-[0.3em] uppercase mb-6 reveal flex items-center gap-4">
-                    <span class="w-8 h-[1px] bg-accent"></span> System Initialization Complete
+            <div class="max-w-6xl">
+                <div class="mono text-emerald-400 text-xs tracking-[0.3em] uppercase mb-8 reveal flex items-center gap-4">
+                    <span class="w-8 h-[1px] bg-emerald-400"></span> System Initialization Complete
                 </div>
-                <h1 class="mono text-5xl md:text-7xl lg:text-8xl font-light tracking-tighter leading-tight reveal" style="transition-delay: 0.1s;">
-                    Waleed Ramzan
+                <h1 class="serif text-[5rem] md:text-[10rem] lg:text-[13rem] leading-[0.8] tracking-tighter reveal glow-text">
+                    Waleed<br><span class="italic text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-500">Ramzan.</span>
                 </h1>
-                <h2 class="mono text-2xl md:text-4xl text-zinc-500 mt-2 reveal" style="transition-delay: 0.2s;">
-                    Soil-to-Plant-to-Canopy Architect
-                </h2>
-                <p class="mt-8 md:mt-12 text-lg md:text-xl font-light text-zinc-400 max-w-3xl leading-relaxed reveal" style="transition-delay: 0.3s;">
-                    Elite Scientific Advisor & Mechatronics Architect. Executing a unified data pipeline bridging rhizosphere biogeochemistry, high-throughput phenotyping (HTP), and programmatic geospatial modeling to isolate sub-visual environmental stress.
+                <p class="mt-8 md:mt-14 text-lg md:text-2xl lg:text-3xl font-light text-zinc-300 max-w-4xl leading-relaxed reveal" style="transition-delay: 0.2s;">
+                    Elite Scientific Advisor & Mechatronics Architect. Executing a unified <span class="text-white font-medium">Soil-to-Plant-to-Canopy</span> data pipeline bridging rhizosphere biogeochemistry, high-throughput phenotyping, and programmatic spatial modeling to isolate sub-visual environmental stress.
                 </p>
-                <div class="mt-12 flex gap-4 reveal" style="transition-delay: 0.4s;">
-                    <a href="#matrix" class="mono text-xs uppercase tracking-widest border border-zinc-700 hover:border-accent hover:text-accent px-6 py-3 transition duration-300 bg-zinc-900/50">Initialize Matrix</a>
-                </div>
             </div>
         </section>
 
-        <section id="matrix" class="snap-section p-6 md:p-24 pt-28 md:pt-32 pb-28 md:pb-24 relative">
-            <div class="mb-10 md:mb-16 reveal flex flex-col md:flex-row md:items-end justify-between border-b border-white/5 pb-6">
-                <h2 class="mono text-3xl md:text-5xl font-light tracking-tight text-zinc-100">The Expertise Matrix</h2>
-                <span class="mono text-[10px] tracking-[0.2em] uppercase text-accent mt-4 md:mt-0 opacity-80">[ STATUS: OPERATIONAL ]</span>
+        <!-- EXPERTISE MATRIX -->
+        <section id="science" class="snap-section p-6 md:p-24 pt-28 md:pt-32 pb-28 md:pb-24 relative">
+            <div class="mb-10 md:mb-16 reveal flex flex-col md:flex-row md:items-end justify-between border-b border-white/10 pb-6 max-w-7xl">
+                <h2 class="serif text-5xl md:text-7xl tracking-tight text-white">The Expertise Matrix</h2>
+                <span class="mono text-[10px] tracking-[0.2em] uppercase text-emerald-400 mt-4 md:mt-0 opacity-80">[ STATUS: OPERATIONAL ]</span>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 md:gap-4 max-w-7xl w-full bg-zinc-800/20 p-1 rounded-sm">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 max-w-7xl w-full">
                 
-                <button onclick="openModal('biogeochem')" class="data-card text-left p-6 md:p-8 reveal flex flex-col justify-between min-h-[180px]" style="transition-delay: 0.1s;">
+                <button onclick="openModal('biogeochem')" class="premium-card glass-panel text-left p-8 rounded-2xl reveal flex flex-col justify-between min-h-[180px]" style="transition-delay: 0.1s;">
                     <div>
-                        <span class="mono text-zinc-600 text-[10px] tracking-[0.2em] uppercase mb-4 block flex justify-between"><span>SYS.01</span> <span class="text-accent opacity-0 group-hover:opacity-100 transition">[ + ]</span></span>
-                        <h3 class="mono text-lg md:text-xl text-zinc-200 mb-3 font-normal">Rhizosphere Chemistry</h3>
+                        <span class="mono text-emerald-500/70 text-[10px] tracking-[0.2em] uppercase mb-4 block flex justify-between"><span>NODE 01</span></span>
+                        <h3 class="serif text-3xl text-white mb-3 font-normal">Rhizosphere Chemistry</h3>
                     </div>
-                    <p class="text-xs md:text-sm font-light text-zinc-400 leading-relaxed">AAS, UV-Vis, 87Sr/86Sr Tracing (ICP-OES/MS), Adsorption-Desorption Kinetics.</p>
+                    <p class="text-sm font-light text-zinc-400 leading-relaxed">AAS, UV-Vis, 87Sr/86Sr Tracing (ICP-OES/MS), Adsorption-Desorption Kinetics.</p>
                 </button>
 
-                <button onclick="openModal('physio')" class="data-card text-left p-6 md:p-8 reveal flex flex-col justify-between min-h-[180px]" style="transition-delay: 0.15s;">
+                <button onclick="openModal('physio')" class="premium-card glass-panel text-left p-8 rounded-2xl reveal flex flex-col justify-between min-h-[180px]" style="transition-delay: 0.15s;">
                     <div>
-                        <span class="mono text-zinc-600 text-[10px] tracking-[0.2em] uppercase mb-4 block flex justify-between"><span>SYS.02</span> <span class="text-accent opacity-0 group-hover:opacity-100 transition">[ + ]</span></span>
-                        <h3 class="mono text-lg md:text-xl text-zinc-200 mb-3 font-normal">Plant Physiology</h3>
+                        <span class="mono text-emerald-500/70 text-[10px] tracking-[0.2em] uppercase mb-4 block flex justify-between"><span>NODE 02</span></span>
+                        <h3 class="serif text-3xl text-white mb-3 font-normal">Plant Physiology</h3>
                     </div>
-                    <p class="text-xs md:text-sm font-light text-zinc-400 leading-relaxed">LI-6800 Portable Photosynthesis, ultra-HPLC, GC Regulatory Pesticide QC.</p>
+                    <p class="text-sm font-light text-zinc-400 leading-relaxed">LI-6800 Portable Photosynthesis, ultra-HPLC, GC Regulatory Pesticide QC.</p>
                 </button>
 
-                <button onclick="openModal('cv')" class="data-card text-left p-6 md:p-8 reveal flex flex-col justify-between min-h-[180px]" style="transition-delay: 0.2s;">
+                <button onclick="openModal('cv')" class="premium-card glass-panel text-left p-8 rounded-2xl reveal flex flex-col justify-between min-h-[180px]" style="transition-delay: 0.2s;">
                     <div>
-                        <span class="mono text-zinc-600 text-[10px] tracking-[0.2em] uppercase mb-4 block flex justify-between"><span>SYS.03</span> <span class="text-accent opacity-0 group-hover:opacity-100 transition">[ + ]</span></span>
-                        <h3 class="mono text-lg md:text-xl text-zinc-200 mb-3 font-normal">Optical Phenotyping</h3>
+                        <span class="mono text-emerald-500/70 text-[10px] tracking-[0.2em] uppercase mb-4 block flex justify-between"><span>NODE 03</span></span>
+                        <h3 class="serif text-3xl text-white mb-3 font-normal">Optical Phenotyping</h3>
                     </div>
-                    <p class="text-xs md:text-sm font-light text-zinc-400 leading-relaxed">Episcopic Green Hyperspectral, AI Stomata Detection (>95% Accuracy).</p>
+                    <p class="text-sm font-light text-zinc-400 leading-relaxed">Episcopic Green Hyperspectral, AI Stomata Detection (>95% Accuracy).</p>
                 </button>
 
-                <button onclick="openModal('mechatronics')" class="data-card text-left p-6 md:p-8 reveal flex flex-col justify-between min-h-[180px]" style="transition-delay: 0.25s;">
+                <button onclick="openModal('mechatronics')" class="premium-card glass-panel text-left p-8 rounded-2xl reveal flex flex-col justify-between min-h-[180px]" style="transition-delay: 0.25s;">
                     <div>
-                        <span class="mono text-zinc-600 text-[10px] tracking-[0.2em] uppercase mb-4 block flex justify-between"><span>SYS.04</span> <span class="text-accent opacity-0 group-hover:opacity-100 transition">[ + ]</span></span>
-                        <h3 class="mono text-lg md:text-xl text-zinc-200 mb-3 font-normal">Edge Mechatronics</h3>
+                        <span class="mono text-emerald-500/70 text-[10px] tracking-[0.2em] uppercase mb-4 block flex justify-between"><span>NODE 04</span></span>
+                        <h3 class="serif text-3xl text-white mb-3 font-normal">Edge Mechatronics</h3>
                     </div>
-                    <p class="text-xs md:text-sm font-light text-zinc-400 leading-relaxed">Raspberry Pi 5, ESP32-S3, StomaSnap v4.4-R1 Architecture, I2C Sensor Arrays.</p>
+                    <p class="text-sm font-light text-zinc-400 leading-relaxed">Raspberry Pi 5, ESP32-S3, StomaSnap v4.4-R1 Architecture, I2C Arrays.</p>
                 </button>
 
-                <button onclick="openModal('geo')" class="data-card text-left p-6 md:p-8 reveal flex flex-col justify-between min-h-[180px]" style="transition-delay: 0.3s;">
+                <button onclick="openModal('geo')" class="premium-card glass-panel text-left p-8 rounded-2xl reveal flex flex-col justify-between min-h-[180px]" style="transition-delay: 0.3s;">
                     <div>
-                        <span class="mono text-zinc-600 text-[10px] tracking-[0.2em] uppercase mb-4 block flex justify-between"><span>SYS.05</span> <span class="text-accent opacity-0 group-hover:opacity-100 transition">[ + ]</span></span>
-                        <h3 class="mono text-lg md:text-xl text-zinc-200 mb-3 font-normal">Geospatial Analytics</h3>
+                        <span class="mono text-emerald-500/70 text-[10px] tracking-[0.2em] uppercase mb-4 block flex justify-between"><span>NODE 05</span></span>
+                        <h3 class="serif text-3xl text-white mb-3 font-normal">Geospatial Analytics</h3>
                     </div>
-                    <p class="text-xs md:text-sm font-light text-zinc-400 leading-relaxed">UAV Flight Planning, IDW/Kriging, Programmatic Python Cubes (geopandas/xarray).</p>
+                    <p class="text-sm font-light text-zinc-400 leading-relaxed">UAV Flight Planning, IDW/Kriging, Programmatic Python Data Cubes.</p>
                 </button>
 
-                <button onclick="openModal('lead')" class="data-card text-left p-6 md:p-8 reveal flex flex-col justify-between min-h-[180px]" style="transition-delay: 0.35s;">
+                <button onclick="openModal('lead')" class="premium-card glass-panel text-left p-8 rounded-2xl reveal flex flex-col justify-between min-h-[180px]" style="transition-delay: 0.35s;">
                     <div>
-                        <span class="mono text-zinc-600 text-[10px] tracking-[0.2em] uppercase mb-4 block flex justify-between"><span>SYS.06</span> <span class="text-accent opacity-0 group-hover:opacity-100 transition">[ + ]</span></span>
-                        <h3 class="mono text-lg md:text-xl text-zinc-200 mb-3 font-normal">Strategic Leadership</h3>
+                        <span class="mono text-emerald-500/70 text-[10px] tracking-[0.2em] uppercase mb-4 block flex justify-between"><span>NODE 06</span></span>
+                        <h3 class="serif text-3xl text-white mb-3 font-normal">Strategic Leadership</h3>
                     </div>
-                    <p class="text-xs md:text-sm font-light text-zinc-400 leading-relaxed">PhenoRob Target Vector, ZALF (Ref. 38-2026), Deutschlandstipendium.</p>
+                    <p class="text-sm font-light text-zinc-400 leading-relaxed">PhenoRob/KOSI Trajectory, ZALF (Ref. 38-2026), Deutschlandstipendium.</p>
                 </button>
 
             </div>
         </section>
 
-        <section id="logs" class="snap-section p-6 md:p-24 pt-28 md:pt-32 pb-28 md:pb-24">
-            <h2 class="mono text-3xl md:text-5xl font-light tracking-tight text-zinc-100 mb-12 md:mb-16 border-b border-white/5 pb-6 reveal">Operational Field Logs</h2>
+        <!-- OPERATIONAL DIRECTIVES -->
+        <section id="notes" class="snap-section p-6 md:p-24 pt-28 md:pt-32 pb-28 md:pb-24">
+            <h2 class="serif text-5xl md:text-6xl lg:text-7xl mb-12 md:mb-16 reveal text-white">Operational Directives</h2>
             
-            <div class="space-y-4 max-w-5xl reveal" style="transition-delay: 0.2s;">
-                <div class="p-6 md:p-8 border border-zinc-800 bg-zinc-900/30 flex flex-col md:flex-row gap-6 md:gap-12 hover:border-zinc-700 transition duration-300">
-                    <div class="md:w-1/4 mono text-xs text-accent tracking-widest uppercase mt-1 flex flex-col">
-                        <span>[ Hardware Core ]</span>
-                        <span class="text-zinc-600 mt-1">StomaSnap v4.4-R1</span>
+            <ul class="space-y-10 md:space-y-14 max-w-5xl reveal" style="transition-delay: 0.2s;">
+                <li class="flex items-start gap-6 group relative z-20 glass-panel p-8 rounded-2xl border-l-4 border-emerald-500 hover:bg-white/5 transition">
+                    <div>
+                        <span class="mono text-emerald-400 text-[10px] tracking-[0.2em] uppercase block mb-3">Hardware Protocol — StomaSnap v4.4-R1</span>
+                        <p class="text-lg md:text-xl font-light leading-relaxed text-zinc-200">"Executing the 52-gate qualification register (P, M, OQ, SQ series). Validating the OQ12 biological non-perturbation closure-kinetics under a strict 15-second thigmonastic clamp constraint."</p>
                     </div>
-                    <div class="md:w-3/4">
-                        <p class="text-base md:text-lg font-light text-zinc-300 leading-relaxed">Executing the 52-gate qualification register (P, M, OQ, SQ series). Validating the OQ12 biological non-perturbation closure-kinetics under a strict 15-second thigmonastic clamp constraint.</p>
-                    </div>
-                </div>
+                </li>
                 
-                <div class="p-6 md:p-8 border border-zinc-800 bg-zinc-900/30 flex flex-col md:flex-row gap-6 md:gap-12 hover:border-zinc-700 transition duration-300">
-                    <div class="md:w-1/4 mono text-xs text-accent tracking-widest uppercase mt-1 flex flex-col">
-                        <span>[ Software Arch ]</span>
-                        <span class="text-zinc-600 mt-1">Open-Science Data</span>
+                <li class="flex items-start gap-6 group relative z-20 glass-panel p-8 rounded-2xl border-l-4 border-cyan-500 hover:bg-white/5 transition">
+                    <div>
+                        <span class="mono text-cyan-400 text-[10px] tracking-[0.2em] uppercase block mb-3">Software Architecture — Open-Science Python</span>
+                        <p class="text-lg md:text-xl font-light leading-relaxed text-zinc-200">"Transitioning strictly to programmatic workflows (geopandas, xarray). Enforcing explicit schema contracts, append-and-flush transactional writes, and deterministic seeds across all spatial modeling."</p>
                     </div>
-                    <div class="md:w-3/4">
-                        <p class="text-base md:text-lg font-light text-zinc-300 leading-relaxed">Transitioning away from GUI-based software. Enforcing explicit schema contracts, append-and-flush transactional writes, and deterministic seeds across all spatial and statistical modeling in Python.</p>
-                    </div>
-                </div>
+                </li>
 
-                <div class="p-6 md:p-8 border border-zinc-800 bg-zinc-900/30 flex flex-col md:flex-row gap-6 md:gap-12 hover:border-zinc-700 transition duration-300">
-                    <div class="md:w-1/4 mono text-xs text-accent tracking-widest uppercase mt-1 flex flex-col">
-                        <span>[ Biostatistics ]</span>
-                        <span class="text-zinc-600 mt-1">Experimental Integrity</span>
+                <li class="flex items-start gap-6 group relative z-20 glass-panel p-8 rounded-2xl border-l-4 border-indigo-500 hover:bg-white/5 transition">
+                    <div>
+                        <span class="mono text-indigo-400 text-[10px] tracking-[0.2em] uppercase block mb-3">Biostatistical Precision — Field Analytics</span>
+                        <p class="text-lg md:text-xl font-light leading-relaxed text-zinc-200">"Always aggregate to plant-level means before evaluating p-values to eliminate pseudoreplication. Always explicitly model Vapor Pressure Deficit (VPD) as an active environmental covariate."</p>
                     </div>
-                    <div class="md:w-3/4">
-                        <p class="text-base md:text-lg font-light text-zinc-300 leading-relaxed">Aggregating strictly to plant-level means before evaluating p-values to eliminate pseudoreplication. Enforcing Vapor Pressure Deficit (VPD) as an active, mandatory environmental covariate in all canopy models.</p>
-                    </div>
+                </li>
+            </ul>
+        </section>
+
+        <!-- PHOTOGRAPHY / LENS -->
+        <section id="lens" class="snap-section p-6 md:p-24 pt-28 md:pt-32 pb-28 md:pb-24">
+            <h2 class="serif text-5xl md:text-6xl lg:text-7xl mb-8 md:mb-12 reveal text-white">@weedslens</h2>
+            <div class="flex flex-wrap gap-4 md:gap-8 mb-10 text-[10px] md:text-xs tracking-[0.2em] uppercase text-zinc-400 mono reveal" style="transition-delay: 0.1s;">
+                <button onclick="filterPhotos('all')" class="hover:text-white transition hover:bg-white/10 px-4 py-2 rounded-full border border-transparent hover:border-white/20">All</button>
+                <button onclick="filterPhotos('landscape')" class="hover:text-white transition hover:bg-white/10 px-4 py-2 rounded-full border border-transparent hover:border-white/20">Landscape</button>
+                <button onclick="filterPhotos('portraits')" class="hover:text-white transition hover:bg-white/10 px-4 py-2 rounded-full border border-transparent hover:border-white/20">Portraits</button>
+                <button onclick="filterPhotos('animals')" class="hover:text-white transition hover:bg-white/10 px-4 py-2 rounded-full border border-transparent hover:border-white/20">Animals</button>
+            </div>
+            <div id="photo-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 h-auto w-full max-w-7xl reveal relative z-20" style="transition-delay: 0.2s;">
+                <div data-category="landscape" class="aspect-[4/5] glass-panel rounded-xl overflow-hidden group"><img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=600" alt="Landscape" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-110 transition duration-700"></div>
+                <div data-category="portraits" class="aspect-[4/5] glass-panel rounded-xl overflow-hidden group"><img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=600" alt="Portrait" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-110 transition duration-700"></div>
+                <div data-category="animals" class="aspect-[4/5] glass-panel rounded-xl overflow-hidden group"><img src="https://images.unsplash.com/photo-1474511320723-9a56873867b5?q=80&w=600" alt="Animal" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-110 transition duration-700"></div>
+                <div data-category="landscape" class="aspect-[4/5] glass-panel rounded-xl overflow-hidden group"><img src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?q=80&w=600" alt="Frame" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-110 transition duration-700"></div>
+            </div>
+        </section>
+
+        <!-- LEXICON -->
+        <section id="lexicon" class="snap-section p-6 md:p-24 pt-28 md:pt-32 pb-28 md:pb-24">
+            <h2 class="serif text-5xl md:text-6xl lg:text-7xl mb-12 md:mb-16 reveal text-white">The Lexicon</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-7xl relative z-20">
+                <div class="glass-panel p-8 rounded-2xl reveal border-t-2 border-t-emerald-500" style="transition-delay: 0.1s;">
+                    <span class="block mono text-emerald-400 mb-4 text-[10px] md:text-xs tracking-[0.2em] uppercase">Native</span>
+                    <span class="font-light text-xl text-white">Urdu<br>Saraiki<br>Punjabi</span>
+                </div>
+                <div class="glass-panel p-8 rounded-2xl reveal border-t-2 border-t-cyan-500" style="transition-delay: 0.2s;">
+                    <span class="block mono text-cyan-400 mb-4 text-[10px] md:text-xs tracking-[0.2em] uppercase">C1 / C2</span>
+                    <span class="font-light text-xl text-white">English<br><span class="text-sm opacity-50 block mt-2 mono">IELTS 7.5</span></span>
+                </div>
+                <div class="glass-panel p-8 rounded-2xl reveal border-t-2 border-t-indigo-500" style="transition-delay: 0.3s;">
+                    <span class="block mono text-indigo-400 mb-4 text-[10px] md:text-xs tracking-[0.2em] uppercase">HSK 2</span>
+                    <span class="font-light text-xl text-white">Chinese<br><span class="text-sm opacity-50 block mt-2 mono">Shenyang Normal Univ.</span></span>
+                </div>
+                <div class="glass-panel p-8 rounded-2xl reveal border-t-2 border-t-zinc-500" style="transition-delay: 0.4s;">
+                    <span class="block mono text-zinc-400 mb-4 text-[10px] md:text-xs tracking-[0.2em] uppercase">A2</span>
+                    <span class="font-light text-xl text-white">German<br><span class="text-sm opacity-50 block mt-2 mono">Working Proficiency</span></span>
                 </div>
             </div>
         </section>
 
+        <!-- CARTOGRAPHY / MAP -->
         <section id="map" class="snap-section p-6 md:p-24 pt-28 md:pt-32 pb-32 md:pb-24">
-            <h2 class="mono text-3xl md:text-5xl font-light tracking-tight text-zinc-100 mb-12 md:mb-16 border-b border-white/5 pb-6 text-center reveal">Global Deployment Nodes</h2>
+            <h2 class="serif text-5xl md:text-6xl lg:text-7xl mb-8 md:mb-12 text-center reveal text-white">Global Deployment Nodes</h2>
             
-            <div class="relative w-full max-w-5xl mx-auto reveal bg-zinc-900/50 border border-zinc-800 p-4 md:p-8" style="transition-delay: 0.2s;">
+            <div class="relative w-full max-w-5xl mx-auto reveal glass-panel rounded-3xl p-4 md:p-8 overflow-hidden" style="transition-delay: 0.2s;">
                 <!-- Minimal Outline Map for Tech Aesthetic -->
-                <img src="https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg" alt="Global Node Map" class="w-full h-auto block opacity-10 pointer-events-none drop-shadow-2xl min-w-[500px]" style="filter: sepia(1) hue-rotate(180deg) saturate(3) brightness(0.5);">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg" alt="Global Node Map" class="w-full h-auto block opacity-15 pointer-events-none drop-shadow-2xl min-w-[500px]" style="filter: sepia(1) hue-rotate(140deg) saturate(3) brightness(0.7);">
 
-                <!-- Map Points Engineered for Precision -->
-                <button class="absolute top-[22%] left-[51%] -translate-x-1/2 -translate-y-1/2 w-2 h-2 md:w-3 md:h-3 bg-accent border border-white cursor-pointer hover:scale-150 transition-transform duration-300 z-10 group" aria-label="Göttingen & Witzenhausen"
+                <!-- Glowing Pings -->
+                <button class="absolute top-[22%] left-[51%] -translate-x-1/2 -translate-y-1/2 w-2 h-2 md:w-3 md:h-3 bg-emerald-400 rounded-full cursor-pointer hover:scale-150 transition-transform duration-300 z-10 group" aria-label="Göttingen"
                      onclick="openLocation('Göttingen & Witzenhausen', 'Universität Göttingen und Universität Kassel.<br><br>Joint M.Sc. Candidate. Graduate Student Assistant for the DFG-funded SP2 MultiStress Project under Dr. Irsa Ejaz (hyperspectral imagery cubes) and the TRIO One Health Project.')">
-                    <div class="absolute inset-0 bg-accent animate-radar rounded-full"></div>
-                    <span class="absolute top-4 left-1/2 -translate-x-1/2 mono text-[9px] bg-zinc-900 border border-zinc-700 px-2 py-1 opacity-0 group-hover:opacity-100 transition whitespace-nowrap text-zinc-300">NODE: GÖTTINGEN</span>
+                    <div class="absolute inset-0 bg-emerald-400 animate-ping rounded-full opacity-75"></div>
+                    <span class="absolute top-6 left-1/2 -translate-x-1/2 mono text-[10px] bg-black/80 backdrop-blur border border-emerald-500/30 px-3 py-1.5 opacity-0 group-hover:opacity-100 transition whitespace-nowrap text-emerald-100 rounded">NODE: GÖTTINGEN</span>
                 </button>
 
-                <button class="absolute top-[20%] left-[53%] -translate-x-1/2 -translate-y-1/2 w-2 h-2 md:w-2.5 md:h-2.5 bg-accent border border-white cursor-pointer hover:scale-150 transition-transform duration-300 z-10 group" aria-label="Müncheberg"
+                <button class="absolute top-[20%] left-[53%] -translate-x-1/2 -translate-y-1/2 w-2 h-2 md:w-2.5 md:h-2.5 bg-cyan-400 rounded-full cursor-pointer hover:scale-150 transition-transform duration-300 z-10 group" aria-label="Müncheberg"
                      onclick="openLocation('Müncheberg, Germany', 'ZALF - Leibniz Centre for Agricultural Landscape Research.<br><br>Strategic target vector (Ref. 38-2026) for the RSI/ECO investigation into plant acquisition of water and nitrogen under drought conditions.')">
-                    <div class="absolute inset-0 bg-accent animate-radar rounded-full" style="animation-delay: 0.2s;"></div>
-                    <span class="absolute top-4 left-1/2 -translate-x-1/2 mono text-[9px] bg-zinc-900 border border-zinc-700 px-2 py-1 opacity-0 group-hover:opacity-100 transition whitespace-nowrap text-zinc-300">NODE: MÜNCHEBERG</span>
+                    <div class="absolute inset-0 bg-cyan-400 animate-ping rounded-full opacity-75" style="animation-delay: 0.2s;"></div>
+                    <span class="absolute top-6 left-1/2 -translate-x-1/2 mono text-[10px] bg-black/80 backdrop-blur border border-cyan-500/30 px-3 py-1.5 opacity-0 group-hover:opacity-100 transition whitespace-nowrap text-cyan-100 rounded">NODE: MÜNCHEBERG</span>
                 </button>
 
-                <button class="absolute top-[21%] left-[52%] -translate-x-1/2 -translate-y-1/2 w-2 h-2 md:w-2.5 md:h-2.5 bg-accent border border-white cursor-pointer hover:scale-150 transition-transform duration-300 z-10 group" aria-label="Potsdam"
+                <button class="absolute top-[21%] left-[52%] -translate-x-1/2 -translate-y-1/2 w-2 h-2 md:w-2.5 md:h-2.5 bg-indigo-400 rounded-full cursor-pointer hover:scale-150 transition-transform duration-300 z-10 group" aria-label="Potsdam"
                      onclick="openLocation('Potsdam, Germany', 'PIK - Potsdam Institute for Climate Impact Research.<br><br>Participated in the I31 Sustainable Land Use and Climate Mitigation course, engaging directly with field-leading experts on global MAgPIE land-use models.')">
-                    <div class="absolute inset-0 bg-accent animate-radar rounded-full" style="animation-delay: 0.4s;"></div>
-                    <span class="absolute top-4 left-1/2 -translate-x-1/2 mono text-[9px] bg-zinc-900 border border-zinc-700 px-2 py-1 opacity-0 group-hover:opacity-100 transition whitespace-nowrap text-zinc-300">NODE: POTSDAM</span>
+                    <div class="absolute inset-0 bg-indigo-400 animate-ping rounded-full opacity-75" style="animation-delay: 0.4s;"></div>
+                    <span class="absolute top-6 left-1/2 -translate-x-1/2 mono text-[10px] bg-black/80 backdrop-blur border border-indigo-500/30 px-3 py-1.5 opacity-0 group-hover:opacity-100 transition whitespace-nowrap text-indigo-100 rounded">NODE: POTSDAM</span>
                 </button>
 
-                <button class="absolute top-[38%] left-[67%] -translate-x-1/2 -translate-y-1/2 w-2 h-2 md:w-3 md:h-3 bg-accent border border-white cursor-pointer hover:scale-150 transition-transform duration-300 z-10 group" aria-label="Multan"
+                <button class="absolute top-[38%] left-[67%] -translate-x-1/2 -translate-y-1/2 w-2 h-2 md:w-3 md:h-3 bg-rose-400 rounded-full cursor-pointer hover:scale-150 transition-transform duration-300 z-10 group" aria-label="Multan"
                      onclick="openLocation('Multan, Pakistan', 'Bahauddin Zakariya University.<br><br>B.Sc. (Hons.) Agriculture (Soil Science). Research Assistant for HEC-NRPU Project No. 17027 under Dr. Shahid Hussain modeling multi-element wastewater irrigation kinetics.')">
-                    <div class="absolute inset-0 bg-accent animate-radar rounded-full" style="animation-delay: 0.6s;"></div>
-                    <span class="absolute top-4 left-1/2 -translate-x-1/2 mono text-[9px] bg-zinc-900 border border-zinc-700 px-2 py-1 opacity-0 group-hover:opacity-100 transition whitespace-nowrap text-zinc-300">NODE: MULTAN</span>
+                    <div class="absolute inset-0 bg-rose-400 animate-ping rounded-full opacity-75" style="animation-delay: 0.6s;"></div>
+                    <span class="absolute top-6 left-1/2 -translate-x-1/2 mono text-[10px] bg-black/80 backdrop-blur border border-rose-500/30 px-3 py-1.5 opacity-0 group-hover:opacity-100 transition whitespace-nowrap text-rose-100 rounded">NODE: MULTAN</span>
                 </button>
 
-                <button class="absolute top-[37%] left-[68%] -translate-x-1/2 -translate-y-1/2 w-2 h-2 md:w-3 md:h-3 bg-accent border border-white cursor-pointer hover:scale-150 transition-transform duration-300 z-10 group" aria-label="Faisalabad"
+                <button class="absolute top-[37%] left-[68%] -translate-x-1/2 -translate-y-1/2 w-2 h-2 md:w-3 md:h-3 bg-amber-400 rounded-full cursor-pointer hover:scale-150 transition-transform duration-300 z-10 group" aria-label="Faisalabad"
                      onclick="openLocation('Punjab, Pakistan', 'Ministry of Agriculture.<br><br>Interned at the Pesticide Quality Control Laboratory. Validated regulatory compliance across 27 coded active ingredients executing intensive HPLC/uHPLC platforms.')">
-                    <div class="absolute inset-0 bg-accent animate-radar rounded-full" style="animation-delay: 0.8s;"></div>
-                    <span class="absolute top-4 left-1/2 -translate-x-1/2 mono text-[9px] bg-zinc-900 border border-zinc-700 px-2 py-1 opacity-0 group-hover:opacity-100 transition whitespace-nowrap text-zinc-300">NODE: PUNJAB</span>
+                    <div class="absolute inset-0 bg-amber-400 animate-ping rounded-full opacity-75" style="animation-delay: 0.8s;"></div>
+                    <span class="absolute top-6 left-1/2 -translate-x-1/2 mono text-[10px] bg-black/80 backdrop-blur border border-amber-500/30 px-3 py-1.5 opacity-0 group-hover:opacity-100 transition whitespace-nowrap text-amber-100 rounded">NODE: PUNJAB</span>
                 </button>
-
             </div>
             <p class="text-center mt-8 md:mt-12 mono uppercase tracking-[0.2em] text-[10px] md:text-xs text-zinc-500 reveal">Access active coordinates for operational history</p>
         </section>
@@ -280,13 +309,15 @@
 
     <!-- Precision Data Modal -->
     <div id="modal" role="dialog" aria-modal="true" class="fixed inset-0 z-[150] modal-glass hidden flex items-center justify-center p-4 md:p-6 opacity-0 transition-opacity duration-300 overflow-hidden">
-        <div class="max-w-3xl w-full h-auto max-h-[85vh] bg-[#09090b] border border-zinc-700 relative flex flex-col shadow-2xl">
-            <!-- Modal Header Bar -->
-            <div class="w-full flex justify-between items-center px-6 py-4 border-b border-zinc-800 bg-zinc-900/50 mono">
-                <span class="text-xs text-accent tracking-widest uppercase">DATA ENTRY <span id="modal-id-tag"></span></span>
-                <button aria-label="Close modal" onclick="closeModal()" class="text-zinc-500 hover:text-white text-xl leading-none">&times;</button>
+        <div class="max-w-4xl w-full h-auto max-h-[85vh] glass-panel border border-white/10 rounded-3xl relative flex flex-col shadow-2xl overflow-hidden">
+            <div class="w-full flex justify-between items-center px-8 py-5 border-b border-white/10 bg-black/40 mono">
+                <span class="text-xs text-emerald-400 tracking-widest uppercase flex items-center gap-2">
+                    <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                    DATA ENTRY <span id="modal-id-tag" class="text-white"></span>
+                </span>
+                <button aria-label="Close modal" onclick="closeModal()" class="text-zinc-400 hover:text-white text-2xl leading-none transition">&times;</button>
             </div>
-            <div id="modal-content-area" class="w-full flex-1 min-h-0 overflow-y-auto"></div>
+            <div id="modal-content-area" class="w-full flex-1 min-h-0 overflow-y-auto bg-black/20"></div>
         </div>
     </div>
 
@@ -301,97 +332,103 @@
         }, { threshold: 0.1 });
         document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
 
-        // Content Structure tailored for Instrument Readout
+        // Photo Grid Filter
+        function filterPhotos(category) {
+            const items = document.querySelectorAll('#photo-grid > div');
+            items.forEach(item => { item.style.display = (category === 'all' || item.dataset.category === category) ? 'block' : 'none'; });
+        }
+
+        // Content Structure tailored for high-end Glassmorphic UI
         const modalData = {
             'biogeochem': `
-                <div class="p-8 md:p-12 relative overflow-hidden">
-                    <h2 class="mono text-2xl md:text-4xl text-zinc-100 mb-8 border-l-4 border-accent pl-4">Rhizosphere Chemistry & Modeling</h2>
-                    <div class="mb-8">
-                        <h3 class="mono text-lg text-accent mb-2 flex items-center gap-2"><span class="w-2 h-2 bg-accent inline-block"></span> Spectrometry & Isotopic Tracing</h3>
-                        <div class="flex items-center gap-3 mb-3">
-                            <span class="px-2 py-1 bg-zinc-800 border border-zinc-700 mono text-[9px] uppercase text-zinc-400">Trace Elements</span>
-                            <span class="px-2 py-1 bg-zinc-800 border border-zinc-700 mono text-[9px] uppercase text-zinc-400">Kinetics</span>
+                <div class="p-8 md:p-12 relative">
+                    <h2 class="serif text-4xl md:text-6xl text-white mb-8 border-l-4 border-emerald-500 pl-6">Rhizosphere Chemistry</h2>
+                    <div class="mb-10">
+                        <h3 class="mono text-lg text-emerald-400 mb-3 flex items-center gap-3">Spectrometry & Isotopic Tracing</h3>
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-full mono text-[9px] uppercase text-zinc-300">Trace Elements</span>
+                            <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-full mono text-[9px] uppercase text-zinc-300">Kinetics</span>
                         </div>
-                        <p class="text-sm font-light leading-relaxed text-zinc-300">Advanced execution of acid digestion protocols, element calibration, and operational deployment of Atomic Absorption Spectrophotometry (AAS), Flame photometry, and UV-Vis. Expert in sample preparation for Strontium isotopic tracing (87Sr/86Sr) via ICP-OES/MS tracking.</p>
+                        <p class="text-base font-light leading-relaxed text-zinc-300">Advanced execution of acid digestion protocols, element calibration, and operational deployment of Atomic Absorption Spectrophotometry (AAS), Flame photometry, and UV-Vis. Expert in sample preparation for Strontium isotopic tracing (87Sr/86Sr) via ICP-OES/MS tracking.</p>
                     </div>
                     <div>
-                        <h3 class="mono text-lg text-accent mb-2 flex items-center gap-2"><span class="w-2 h-2 bg-accent inline-block"></span> Contaminant Kinetics Modeling</h3>
-                        <div class="flex items-center gap-3 mb-3">
-                            <span class="px-2 py-1 bg-zinc-800 border border-zinc-700 mono text-[9px] uppercase text-zinc-400">Langmuir</span>
-                            <span class="px-2 py-1 bg-zinc-800 border border-zinc-700 mono text-[9px] uppercase text-zinc-400">Freundlich</span>
+                        <h3 class="mono text-lg text-emerald-400 mb-3 flex items-center gap-3">Contaminant Kinetics Modeling</h3>
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-full mono text-[9px] uppercase text-zinc-300">Langmuir</span>
+                            <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-full mono text-[9px] uppercase text-zinc-300">Freundlich</span>
                         </div>
-                        <p class="text-sm font-light leading-relaxed text-zinc-300">Specialized in modeling competitive heavy metal(loid) co-contamination adsorption-desorption kinetics. Executing pseudo-second-order kinetics and non-linear equilibrium isotherms to map rhizosphere bioaccumulation.</p>
+                        <p class="text-base font-light leading-relaxed text-zinc-300">Specialized in modeling competitive heavy metal(loid) co-contamination adsorption-desorption kinetics. Executing pseudo-second-order kinetics and non-linear equilibrium isotherms to map rhizosphere bioaccumulation.</p>
                     </div>
                 </div>
             `,
             'physio': `
-                <div class="p-8 md:p-12 relative overflow-hidden">
-                    <h2 class="mono text-2xl md:text-4xl text-zinc-100 mb-8 border-l-4 border-accent pl-4">Plant Physiology & Analytics</h2>
-                    <div class="mb-8">
-                        <h3 class="mono text-lg text-accent mb-2 flex items-center gap-2"><span class="w-2 h-2 bg-accent inline-block"></span> Gas Exchange & Chlorophyll Fluorescence</h3>
-                        <p class="text-sm font-light leading-relaxed text-zinc-300 mt-3">Direct operational command of the LI-6800 Portable Photosynthesis System. Extracting high-resolution physiological variables to monitor sub-visual drought and frost stress pathways dynamically.</p>
+                <div class="p-8 md:p-12 relative">
+                    <h2 class="serif text-4xl md:text-6xl text-white mb-8 border-l-4 border-emerald-500 pl-6">Plant Physiology</h2>
+                    <div class="mb-10">
+                        <h3 class="mono text-lg text-emerald-400 mb-3 flex items-center gap-3">Gas Exchange & Fluorescence</h3>
+                        <p class="text-base font-light leading-relaxed text-zinc-300 mt-3">Direct operational command of the LI-6800 Portable Photosynthesis System. Extracting high-resolution physiological variables to monitor sub-visual drought and frost stress pathways dynamically.</p>
                     </div>
                     <div>
-                        <h3 class="mono text-lg text-accent mb-2 flex items-center gap-2"><span class="w-2 h-2 bg-accent inline-block"></span> Regulatory Chromatography</h3>
-                        <p class="text-sm font-light leading-relaxed text-zinc-300 mt-3">Executed rigorous Quality Control (QC) operations on ultra-HPLC, HPLC, and Gas Chromatography (GC) systems for regulatory pesticide profiling, validating compliance across 27 coded active ingredients.</p>
+                        <h3 class="mono text-lg text-emerald-400 mb-3 flex items-center gap-3">Regulatory Chromatography</h3>
+                        <p class="text-base font-light leading-relaxed text-zinc-300 mt-3">Executed rigorous Quality Control (QC) operations on ultra-HPLC, HPLC, and Gas Chromatography (GC) systems for regulatory pesticide profiling, validating compliance across 27 coded active ingredients.</p>
                     </div>
                 </div>
             `,
             'cv': `
-                <div class="p-8 md:p-12 relative overflow-hidden">
-                    <h2 class="mono text-2xl md:text-4xl text-zinc-100 mb-8 border-l-4 border-accent pl-4">Optical Phenotyping & CV</h2>
-                    <div class="mb-8">
-                        <h3 class="mono text-lg text-accent mb-2 flex items-center gap-2"><span class="w-2 h-2 bg-accent inline-block"></span> AI-Powered Stomata Detection</h3>
-                        <p class="text-sm font-light leading-relaxed text-zinc-300 mt-3">Engineered a robust machine learning pipeline for non-destructive, high-throughput phenotyping. Automated stomata detection to completely replace manual microscopy counting, reducing dataset processing times from 7 days to 1 day with a verified accuracy of >95%.</p>
+                <div class="p-8 md:p-12 relative">
+                    <h2 class="serif text-4xl md:text-6xl text-white mb-8 border-l-4 border-emerald-500 pl-6">Optical Phenotyping & CV</h2>
+                    <div class="mb-10">
+                        <h3 class="mono text-lg text-emerald-400 mb-3 flex items-center gap-3">AI-Powered Stomata Detection</h3>
+                        <p class="text-base font-light leading-relaxed text-zinc-300 mt-3">Engineered a robust machine learning pipeline for non-destructive, high-throughput phenotyping. Automated stomata detection to completely replace manual microscopy counting, reducing dataset processing times from 7 days to 1 day with a verified accuracy of >95%.</p>
                     </div>
                     <div>
-                        <h3 class="mono text-lg text-accent mb-2 flex items-center gap-2"><span class="w-2 h-2 bg-accent inline-block"></span> Hyperspectral Imaging Arrays</h3>
-                        <p class="text-sm font-light leading-relaxed text-zinc-300 mt-3">Architecture and execution of cross-polarized coaxial reflected-light (episcopic) green (520–530 nm) hyperspectral and chlorophyll fluorescence arrays to map physiological status before visual stress becomes apparent.</p>
+                        <h3 class="mono text-lg text-emerald-400 mb-3 flex items-center gap-3">Hyperspectral Imaging Arrays</h3>
+                        <p class="text-base font-light leading-relaxed text-zinc-300 mt-3">Architecture and execution of cross-polarized coaxial reflected-light (episcopic) green (520–530 nm) hyperspectral and chlorophyll fluorescence arrays to map physiological status before visual stress becomes apparent.</p>
                     </div>
                 </div>
             `,
             'mechatronics': `
-                <div class="p-8 md:p-12 relative overflow-hidden">
-                    <h2 class="mono text-2xl md:text-4xl text-zinc-100 mb-8 border-l-4 border-accent pl-4">Edge Computing & Mechatronics</h2>
-                    <div class="mb-8">
-                        <h3 class="mono text-lg text-accent mb-2 flex items-center gap-2"><span class="w-2 h-2 bg-accent inline-block"></span> StomaSnap v4.4-R1 Architecture</h3>
-                        <div class="flex items-center gap-3 mb-3">
-                            <span class="px-2 py-1 bg-zinc-800 border border-zinc-700 mono text-[9px] uppercase text-zinc-400">Master Handbook Author</span>
+                <div class="p-8 md:p-12 relative">
+                    <h2 class="serif text-4xl md:text-6xl text-white mb-8 border-l-4 border-emerald-500 pl-6">Edge Computing & Mechatronics</h2>
+                    <div class="mb-10">
+                        <h3 class="mono text-lg text-emerald-400 mb-3 flex items-center gap-3">StomaSnap v4.4-R1 Architecture</h3>
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-full mono text-[9px] uppercase text-zinc-300">Master Handbook Author</span>
                         </div>
-                        <p class="text-sm font-light leading-relaxed text-zinc-300">De-risked system complexity by enforcing direct-drive micrometer spindles, captive spring preloads, and a strict 15-second thigmonastic clamp constraint. Currently executing the 52-gate qualification register (P, M, OQ, SQ series).</p>
+                        <p class="text-base font-light leading-relaxed text-zinc-300">De-risked system complexity by enforcing direct-drive micrometer spindles, captive spring preloads, and a strict 15-second thigmonastic clamp constraint. Currently executing the 52-gate qualification register (P, M, OQ, SQ series).</p>
                     </div>
                     <div>
-                        <h3 class="mono text-lg text-accent mb-2 flex items-center gap-2"><span class="w-2 h-2 bg-accent inline-block"></span> Heterogeneous Sensor Networks</h3>
-                        <p class="text-sm font-light leading-relaxed text-zinc-300 mt-3">Systems design spanning Raspberry Pi 5 (8GB), ESP32-S3 WROOM, and RP2040-Zero. Integrated with high-precision digital/analog sensor networks over hardware I2C/SPI interfaces, resolving address collisions with TCA9548A multiplexers and 16-bit ADCs, all governed by an offline-first data structure.</p>
+                        <h3 class="mono text-lg text-emerald-400 mb-3 flex items-center gap-3">Heterogeneous Sensor Networks</h3>
+                        <p class="text-base font-light leading-relaxed text-zinc-300 mt-3">Systems design spanning Raspberry Pi 5 (8GB), ESP32-S3 WROOM, and RP2040-Zero. Integrated with high-precision digital/analog sensor networks over hardware I2C/SPI interfaces, resolving address collisions with TCA9548A multiplexers and 16-bit ADCs, all governed by an offline-first data structure.</p>
                     </div>
                 </div>
             `,
             'geo': `
-                <div class="p-8 md:p-12 relative overflow-hidden">
-                    <h2 class="mono text-2xl md:text-4xl text-zinc-100 mb-8 border-l-4 border-accent pl-4">Geostatistical Spatial Analytics</h2>
-                    <div class="mb-8">
-                        <h3 class="mono text-lg text-accent mb-2 flex items-center gap-2"><span class="w-2 h-2 bg-accent inline-block"></span> Programmatic Data Cubes</h3>
-                        <p class="text-sm font-light leading-relaxed text-zinc-300 mt-3">Actively transitioning spatial analysis from GUI-based software (ArcGIS Pro) into programmatic workflows executing highly optimized spatial data cubes via Python libraries (geopandas, rasterio, xarray, shapely).</p>
+                <div class="p-8 md:p-12 relative">
+                    <h2 class="serif text-4xl md:text-6xl text-white mb-8 border-l-4 border-emerald-500 pl-6">Geospatial Analytics</h2>
+                    <div class="mb-10">
+                        <h3 class="mono text-lg text-emerald-400 mb-3 flex items-center gap-3">Programmatic Data Cubes</h3>
+                        <p class="text-base font-light leading-relaxed text-zinc-300 mt-3">Actively transitioning spatial analysis from GUI-based software (ArcGIS Pro) into programmatic workflows executing highly optimized spatial data cubes via Python libraries (geopandas, rasterio, xarray, shapely).</p>
                     </div>
                     <div>
-                        <h3 class="mono text-lg text-accent mb-2 flex items-center gap-2"><span class="w-2 h-2 bg-accent inline-block"></span> Interpolation & UAV Flight Planning</h3>
-                        <p class="text-sm font-light leading-relaxed text-zinc-300 mt-3">Command of UAV drone flight planning and multi-spectral vegetation index extraction (NDVI, NDRE). Applied regional and city-scale spatial interpolation utilizing IDW and Kriging interpolation models.</p>
+                        <h3 class="mono text-lg text-emerald-400 mb-3 flex items-center gap-3">Interpolation & UAV Flight Planning</h3>
+                        <p class="text-base font-light leading-relaxed text-zinc-300 mt-3">Command of UAV drone flight planning and multi-spectral vegetation index extraction (NDVI, NDRE). Applied regional and city-scale spatial interpolation utilizing IDW and Kriging interpolation models.</p>
                     </div>
                 </div>
             `,
             'lead': `
-                <div class="p-8 md:p-12 relative overflow-hidden">
-                    <h2 class="mono text-2xl md:text-4xl text-zinc-100 mb-8 border-l-4 border-accent pl-4">Strategic Roadmaps & Leadership</h2>
-                    <div class="mb-8">
-                        <h3 class="mono text-lg text-accent mb-2 flex items-center gap-2"><span class="w-2 h-2 bg-accent inline-block"></span> PhD Target Vectors</h3>
-                        <div class="flex items-center gap-3 mb-3">
-                            <span class="px-2 py-1 bg-zinc-800 border border-zinc-700 mono text-[9px] uppercase text-zinc-400">Elite German Clusters</span>
+                <div class="p-8 md:p-12 relative">
+                    <h2 class="serif text-4xl md:text-6xl text-white mb-8 border-l-4 border-emerald-500 pl-6">Strategic Roadmaps</h2>
+                    <div class="mb-10">
+                        <h3 class="mono text-lg text-emerald-400 mb-3 flex items-center gap-3">PhD Target Vectors</h3>
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-full mono text-[9px] uppercase text-zinc-300">Elite German Clusters</span>
                         </div>
-                        <p class="text-sm font-light leading-relaxed text-zinc-300">Actively positioning for a funded PhD inside the PhenoRob Cluster of Excellence (Bonn/Göttingen) focusing on autonomous field phenotyping, targeting stable isotope probing (δ13C/δ15N) at KOSI, and pursuing the ZALF RSI/ECO investigation into crop resource acquisition (Ref. 38-2026).</p>
+                        <p class="text-base font-light leading-relaxed text-zinc-300">Actively positioning for a funded PhD inside the PhenoRob Cluster of Excellence (Bonn/Göttingen) focusing on autonomous field phenotyping, targeting stable isotope probing (δ13C/δ15N) at KOSI, and pursuing the ZALF RSI/ECO investigation into crop resource acquisition (Ref. 38-2026).</p>
                     </div>
                     <div>
-                        <h3 class="mono text-lg text-accent mb-2 flex items-center gap-2"><span class="w-2 h-2 bg-accent inline-block"></span> Institutional Excellence</h3>
-                        <p class="text-sm font-light leading-relaxed text-zinc-300 mt-3">Joint M.Sc. Candidate in Sustainable International Agriculture. Recipient of the prestigious Deutschlandstipendium (German National Scholarship) 2024/25 for high academic merit.</p>
+                        <h3 class="mono text-lg text-emerald-400 mb-3 flex items-center gap-3">Institutional Excellence</h3>
+                        <p class="text-base font-light leading-relaxed text-zinc-300 mt-3">Joint M.Sc. Candidate in Sustainable International Agriculture. Recipient of the prestigious Deutschlandstipendium (German National Scholarship) 2024/25 for high academic merit.</p>
                     </div>
                 </div>
             `
@@ -401,16 +438,15 @@
             contentArea.innerHTML = modalData[id];
             modalIdTag.textContent = `[ ${id.toUpperCase()} ]`;
             modal.classList.remove('hidden');
-            // Small timeout to allow display:block to register before opacity transition
             setTimeout(() => modal.classList.remove('opacity-0'), 10);
             document.body.style.overflow = 'hidden'; 
         }
 
         function openLocation(title, desc) {
             contentArea.innerHTML = `
-                <div class="p-8 md:p-12 overflow-hidden">
-                    <h2 class="mono text-2xl md:text-4xl text-zinc-100 mb-6 border-l-4 border-accent pl-4">${title}</h2>
-                    <div class="mt-6 text-sm font-light leading-relaxed text-zinc-300">${desc}</div>
+                <div class="p-8 md:p-12">
+                    <h2 class="serif text-4xl md:text-5xl text-white mb-6 border-l-4 border-emerald-400 pl-6">${title}</h2>
+                    <div class="mt-6 text-base font-light leading-relaxed text-zinc-300">${desc}</div>
                 </div>
             `;
             modalIdTag.textContent = `[ GEO_NODE ]`;
@@ -425,15 +461,122 @@
                 modal.classList.add('hidden');
                 contentArea.innerHTML = '';
                 document.body.style.overflow = '';
-            }, 300); // Matched to transition duration
+            }, 300); 
         }
 
-        // Accessibility: Close modal on ESC key
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-                closeModal();
-            }
+            if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeModal();
         });
+
+        // ----------------------------------------------------
+        // THE BIOLUMINESCENT CANOPY (Interactive Canvas)
+        // ----------------------------------------------------
+        const canvas = document.getElementById('network-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        let width, height;
+        let particles = [];
+        const isMobile = window.innerWidth < 768;
+        const PARTICLE_COUNT = isMobile ? 35 : 75; 
+        const MAX_DIST = isMobile ? 120 : 180;
+        
+        let mouse = { x: null, y: null };
+        
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 0.3;
+                this.vy = (Math.random() - 0.8) * 0.5; // Upward bias for Soil-to-Canopy flow
+                this.radius = Math.random() * 2 + 0.5;
+                // Mix of Emerald and Cyan
+                this.color = Math.random() > 0.5 ? '16, 185, 129' : '14, 165, 233'; 
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0) this.y = height; // Wrap to bottom
+                if (this.y > height) this.y = 0; // Wrap to top
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${this.color}, 0.6)`;
+                ctx.fill();
+                // Glow effect
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = `rgba(${this.color}, 0.8)`;
+            }
+        }
+        
+        function initNetwork() {
+            particles = [];
+            for (let i = 0; i < PARTICLE_COUNT; i++) {
+                particles.push(new Particle());
+            }
+        }
+        
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+                ctx.shadowBlur = 0; // reset for lines
+                
+                for (let j = i; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (dist < MAX_DIST) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(16, 185, 129, ${(1 - dist/MAX_DIST) * 0.15})`;
+                        ctx.lineWidth = 0.8;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+                
+                if (mouse.x != null && mouse.y != null) {
+                    const dxm = particles[i].x - mouse.x;
+                    const dym = particles[i].y - mouse.y;
+                    const distm = Math.sqrt(dxm * dxm + dym * dym);
+                    if (distm < MAX_DIST * 1.2) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(14, 165, 233, ${(1 - distm/(MAX_DIST*1.2)) * 0.3})`;
+                        ctx.lineWidth = 1;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(mouse.x, mouse.y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+        
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => { resize(); initNetwork(); }, 250);
+        });
+
+        document.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; }, { passive: true });
+        document.getElementById('main-scroll').addEventListener('scroll', () => {
+            if(isMobile) { mouse.x = width/2; mouse.y = height/2; }
+        }, { passive: true });
+        document.addEventListener('mouseleave', () => { mouse.x = null; mouse.y = null; });
+        
+        resize();
+        initNetwork();
+        animate();
     </script>
 </body>
 </html>
