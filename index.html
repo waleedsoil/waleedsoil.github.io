@@ -1,582 +1,886 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waleed Ramzan | TheSoilKid </title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@200;300;400;600&family=JetBrains+Mono:wght@100;400;700&display=swap');
-        
-        :root { 
-            --bg-deep: #050507; 
-            --bg-mid: #0a0f12; 
-            --bg-high: #0f171e; 
-            --text-main: #f8fafc;      
-            --accent-primary: #10b981; /* Emerald */
-            --accent-secondary: #0ea5e9; /* Sky/Cyan */
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --glass-bg: rgba(10, 15, 18, 0.6);
-        }
-        
-        body, html { 
-            font-family: 'Inter', sans-serif; 
-            color: var(--text-main); 
-            margin: 0; 
-            overflow-x: hidden;
-            background: var(--bg-deep);
-            background-image: radial-gradient(circle at 50% 0%, var(--bg-high) 0%, var(--bg-deep) 70%);
-            background-attachment: fixed;
-        }
-        
-        .serif { font-family: 'Instrument Serif', serif; }
-        .mono { font-family: 'JetBrains Mono', monospace; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Waleed Ramzan — soil, leaf and canopy measurement</title>
+<meta name="description" content="Waleed Ramzan (TheSoilKid) — MSc researcher measuring crop stress from the rhizosphere to the canopy, and building the field instruments that do the measuring.">
+<meta name="theme-color" content="#0B0A09">
 
-        /* Agritech Data Network Canvas */
-        #network-canvas {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            z-index: 0; pointer-events: none; opacity: 0.85;
-        }
+<meta property="og:title" content="Waleed Ramzan — soil, leaf and canopy measurement">
+<meta property="og:description" content="Rhizosphere chemistry, leaf-level phenotyping, UAV survey, and the StomaSnap handheld field microscope.">
+<meta property="og:type" content="profile">
 
-        /* Subtle Technical Grid Overlay */
-        .tech-grid {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background-size: 60px 60px;
-            background-image: 
-                linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
-            z-index: 1; pointer-events: none; mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
-        }
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..500&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 
-        /* Responsive Scroll Snapping */
-        .snap-container { height: 100vh; overflow-y: scroll; overflow-x: hidden; scroll-snap-type: y mandatory; position: relative; z-index: 10; }
-        .snap-section { min-height: 100vh; scroll-snap-align: start; display: flex; flex-direction: column; justify-content: center; position: relative; }
-        
-        /* Glassmorphism UI */
-        .glass-panel { 
-            background: var(--glass-bg); 
-            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); 
-            border: 1px solid var(--glass-border); 
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
-        
-        /* Modals & Scrollbars */
-        .modal-glass { background: rgba(5, 5, 7, 0.95); backdrop-filter: blur(20px); }
-        #modal-content-area::-webkit-scrollbar { width: 4px; }
-        #modal-content-area::-webkit-scrollbar-thumb { background: rgba(16, 185, 129, 0.5); border-radius: 4px; }
+<style>
+/* ============================================================
+   TOKENS — a soil profile, not a neon dashboard.
+   Darks are warm (peat / humus / clay), the one bright value is
+   living leaf green, water blue marks anything hydrological.
+   ============================================================ */
+:root{
+  --ink:#0B0A09;
+  --panel:#15110D;
+  --panel-2:#1E1711;
+  --line:#2E241B;
+  --line-soft:rgba(240,233,221,.09);
+  --text:#F0E9DD;
+  --muted:#9C9084;
+  --leaf:#9BC53D;
+  --leaf-soft:rgba(155,197,61,.13);
+  --water:#6FA8C4;
+  --clay:#C9814E;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,Segoe UI,sans-serif;
+  --serif:'Fraunces','Iowan Old Style',Georgia,serif;
+  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --ease:cubic-bezier(.2,.8,.2,1);
+  --pad:clamp(1.25rem,4vw,3rem);
+}
 
-        /* Reveal Animations */
-        .reveal { opacity: 0; transform: translateY(40px); transition: all 1s cubic-bezier(0.16, 1, 0.3, 1); }
-        .reveal.active { opacity: 1; transform: translateY(0); }
-        
-        /* Interactive Cards */
-        .premium-card { transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); position: relative; overflow: hidden; }
-        .premium-card::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, rgba(16,185,129,0.1) 0%, transparent 100%);
-            opacity: 0; transition: opacity 0.5s ease;
-        }
-        .premium-card:hover { transform: translateY(-8px); border-color: rgba(16, 185, 129, 0.4); box-shadow: 0 20px 40px -10px rgba(16, 185, 129, 0.15); }
-        .premium-card:hover::before { opacity: 1; }
-        
-        /* Glows & Pings */
-        .glow-text { text-shadow: 0 0 20px rgba(16, 185, 129, 0.4); }
-        @keyframes ping-slow { 75%, 100% { transform: scale(2.5); opacity: 0; } }
-        .animate-ping-slow { animation: ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite; }
-        
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    </style>
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  background:var(--ink);
+  color:var(--text);
+  font-family:var(--sans);
+  font-weight:300;
+  font-size:17px;
+  line-height:1.65;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+/* soil grain — static, never animated */
+body::after{
+  content:"";position:fixed;inset:0;z-index:60;pointer-events:none;opacity:.055;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+img{max-width:100%;display:block}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--leaf);outline-offset:3px;border-radius:2px}
+
+/* ---------- type scale ---------- */
+h1,h2,h3{font-family:var(--serif);font-weight:300;margin:0;font-variation-settings:"SOFT" 20,"WONK" 1}
+.display{
+  font-size:clamp(3.4rem,13vw,8.5rem);
+  line-height:.86;letter-spacing:-.025em;
+  font-variation-settings:"opsz" 144,"SOFT" 30,"WONK" 1;
+}
+.sec-title{font-size:clamp(2rem,4.6vw,3.4rem);line-height:1.02;letter-spacing:-.02em;font-variation-settings:"opsz" 100,"SOFT" 24}
+.lede{font-size:clamp(1.12rem,2.1vw,1.42rem);line-height:1.5;max-width:44ch;color:var(--text)}
+.prose{max-width:64ch;color:var(--muted)}
+.prose strong{color:var(--text);font-weight:400}
+.data{font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;color:var(--muted);font-weight:400}
+.tnum{font-variant-numeric:tabular-nums}
+
+.wrap{width:min(1200px,100%);margin-inline:auto;padding-inline:var(--pad)}
+.band{padding-block:clamp(4.5rem,11vh,8rem);position:relative;scroll-margin-top:76px}
+.band + .band{border-top:1px solid var(--line)}
+
+/* ---------- top bar ---------- */
+.topbar{
+  position:fixed;inset:0 0 auto 0;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  padding:.85rem var(--pad);
+  background:rgba(11,10,9,.9);
+  background:color-mix(in srgb,var(--ink) 86%,transparent);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+}
+.brand{font-family:var(--mono);font-size:.76rem;letter-spacing:.04em;display:flex;align-items:center;gap:.55rem;white-space:nowrap}
+.brand b{font-weight:500}
+.brand i{width:6px;height:6px;border-radius:50%;background:var(--leaf);display:inline-block;box-shadow:0 0 0 3px var(--leaf-soft)}
+.brand span{color:var(--muted)}
+.navlinks{display:flex;gap:1.35rem;font-size:.82rem;color:var(--muted);overflow-x:auto;scrollbar-width:none}
+.navlinks::-webkit-scrollbar{display:none}
+.navlinks a{text-decoration:none;padding-block:.25rem;border-bottom:1px solid transparent;transition:color .25s,border-color .25s;white-space:nowrap}
+.navlinks a:hover{color:var(--text)}
+.navlinks a.on{color:var(--leaf);border-color:var(--leaf)}
+@media (max-width:760px){.navlinks{display:none}}
+.scrollbar{position:fixed;top:0;left:0;height:2px;width:100%;transform-origin:0 50%;transform:scaleX(0);background:var(--leaf);z-index:55}
+
+/* ---------- left depth rail ---------- */
+.rail{position:fixed;left:22px;top:50%;transform:translateY(-50%);z-index:45;display:none;flex-direction:column;gap:0}
+@media (min-width:1400px){.rail{display:flex}}
+.rail a{display:flex;align-items:center;gap:.6rem;text-decoration:none;padding:.42rem 0;color:var(--muted)}
+.rail i{display:block;height:1px;width:14px;background:currentColor;transition:width .35s var(--ease),background .35s}
+.rail span{font-family:var(--mono);font-size:.62rem;letter-spacing:.05em;opacity:0;transform:translateX(-4px);transition:opacity .3s,transform .3s}
+.rail a:hover span,.rail a.on span{opacity:1;transform:none}
+.rail a.on{color:var(--leaf)}
+.rail a.on i{width:28px}
+
+/* ---------- hero ---------- */
+.hero{padding-top:clamp(7rem,17vh,10rem);padding-bottom:clamp(3rem,7vh,5rem)}
+.hero-grid{display:grid;gap:clamp(2rem,5vw,4rem);grid-template-columns:1fr;align-items:end}
+@media (min-width:960px){.hero-grid{grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr)}}
+.hero-name{margin-bottom:1.6rem}
+.hero-name em{font-style:italic;color:var(--leaf);font-variation-settings:"opsz" 144,"SOFT" 40,"WONK" 1}
+.hero-meta{display:flex;flex-wrap:wrap;gap:.5rem .9rem;margin-bottom:1.5rem;align-items:center}
+.tag{font-family:var(--mono);font-size:.68rem;letter-spacing:.04em;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:.26rem .7rem}
+.tag.live{color:var(--leaf);border-color:rgba(155,197,61,.35);background:var(--leaf-soft)}
+
+.figures{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;margin-top:2.6rem;background:var(--line);border:1px solid var(--line)}
+.fig{background:var(--ink);padding:1.05rem 1.1rem}
+.fig b{display:block;font-family:var(--serif);font-weight:400;font-size:clamp(1.5rem,3.6vw,2.3rem);line-height:1;letter-spacing:-.02em;font-variation-settings:"opsz" 60}
+.fig span{display:block;margin-top:.45rem;font-size:.78rem;color:var(--muted);line-height:1.35}
+
+/* ---------- hero figure (soil section) ---------- */
+.section-svg{width:100%;height:auto;max-height:62vh;display:block;border:1px solid var(--line);background:linear-gradient(180deg,#0E0C0A 0%,#100D0A 40%,#0B0A09 100%)}
+.draw{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.5s var(--ease) forwards}
+.draw.d2{animation-delay:.25s}.draw.d3{animation-delay:.45s}.draw.d4{animation-delay:.65s}
+@keyframes draw{to{stroke-dashoffset:0}}
+.fade-in{opacity:0;animation:fade .9s var(--ease) .8s forwards}
+@keyframes fade{to{opacity:1}}
+.pore{transform-box:fill-box;transform-origin:center;animation:breathe 7s ease-in-out 1.6s infinite}
+@keyframes breathe{0%,100%{transform:scaleY(.22)}45%,55%{transform:scaleY(1)}}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .draw,.fade-in,.pore{animation:none}
+  .draw{stroke-dashoffset:0}
+  .fade-in{opacity:1}
+  .pore{transform:scaleY(.7)}
+  *{transition-duration:.01ms!important}
+}
+
+/* ---------- section heads ---------- */
+.sec-head{display:grid;gap:1rem;margin-bottom:clamp(2rem,5vw,3.4rem);max-width:70ch}
+.sec-head p{margin:0;color:var(--muted);max-width:58ch}
+
+/* ---------- horizons + expandable rows ---------- */
+.horizon{margin-bottom:2.6rem}
+.horizon-bar{display:flex;align-items:baseline;gap:.9rem;padding-bottom:.7rem;border-bottom:1px solid var(--line)}
+.swatch{width:10px;height:34px;flex:none;border-radius:1px}
+.horizon h3{font-size:1.32rem;font-variation-settings:"opsz" 40,"SOFT" 20}
+.horizon-range{margin-left:auto;font-family:var(--mono);font-size:.68rem;color:var(--muted)}
+.row{border-bottom:1px solid var(--line-soft)}
+.row-head{
+  display:grid;grid-template-columns:88px minmax(0,1fr) 26px;align-items:start;gap:1rem;
+  width:100%;text-align:left;padding:1.15rem .25rem;transition:background .3s;
+}
+.row-head:hover{background:rgba(240,233,221,.025)}
+.row-depth{font-family:var(--mono);font-size:.72rem;color:var(--muted);padding-top:.28rem;font-variant-numeric:tabular-nums}
+.row-title{font-family:var(--serif);font-size:1.22rem;line-height:1.25;display:block;font-variation-settings:"opsz" 36,"SOFT" 18}
+.row-sum{display:block;color:var(--muted);font-size:.9rem;margin-top:.2rem}
+.row-mark{position:relative;width:14px;height:14px;margin-top:.5rem;justify-self:end}
+.row-mark::before,.row-mark::after{content:"";position:absolute;background:var(--muted);transition:transform .4s var(--ease),background .3s}
+.row-mark::before{top:6px;left:0;width:14px;height:1px}
+.row-mark::after{left:6px;top:0;height:14px;width:1px}
+.row-head[aria-expanded="true"] .row-mark::after{transform:scaleY(0)}
+.row-head[aria-expanded="true"] .row-mark::before{background:var(--leaf)}
+.row-head[aria-expanded="true"] .row-title{color:var(--leaf)}
+.row-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .5s var(--ease)}
+.row-head[aria-expanded="true"] + .row-body{grid-template-rows:1fr}
+.row-body > div{overflow:hidden}
+.row-inner{padding:0 .25rem 1.6rem 88px;max-width:72ch;color:var(--muted)}
+.row-inner p{margin:0 0 .9rem}
+.row-inner p:last-child{margin-bottom:0}
+.chips{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1rem}
+.chip{font-family:var(--mono);font-size:.64rem;letter-spacing:.03em;color:var(--text);border:1px solid var(--line);padding:.2rem .55rem;border-radius:2px}
+@media (max-width:680px){
+  .row-head{grid-template-columns:minmax(0,1fr) 26px}
+  .row-depth{grid-row:2;grid-column:1;padding-top:.45rem}
+  .row-inner{padding-left:.25rem}
+}
+
+/* ---------- instrument feature ---------- */
+.instr{display:grid;gap:clamp(1.5rem,4vw,3rem);grid-template-columns:1fr}
+@media (min-width:900px){.instr{grid-template-columns:minmax(260px,.8fr) minmax(0,1.2fr)}}
+.instr-card{border:1px solid var(--line);background:var(--panel);padding:1.4rem}
+.instr-card h3{font-size:1.15rem;margin-bottom:.5rem}
+.spec{display:grid;grid-template-columns:auto 1fr;gap:.5rem 1.1rem;font-size:.85rem;margin-top:1.2rem}
+.spec dt{font-family:var(--mono);font-size:.7rem;color:var(--muted);padding-top:.15rem}
+.spec dd{margin:0}
+.gates{margin-top:1.4rem}
+.gate-track{display:flex;gap:3px;flex-wrap:wrap}
+.gate{width:9px;height:16px;background:var(--line);border-radius:1px}
+.gate.now{background:var(--clay)}
+.rules{display:grid;gap:0;margin-top:1rem;border-top:1px solid var(--line)}
+.rule{padding:1.15rem 0;border-bottom:1px solid var(--line-soft);display:grid;gap:.35rem}
+.rule b{font-family:var(--serif);font-weight:400;font-size:1.12rem;font-variation-settings:"opsz" 36}
+.rule span{color:var(--muted);font-size:.95rem}
+
+/* ---------- ahead / targets ---------- */
+.targets{display:grid;gap:1px;background:var(--line);border:1px solid var(--line)}
+@media (min-width:820px){.targets{grid-template-columns:repeat(3,1fr)}}
+.target{background:var(--ink);padding:1.5rem 1.4rem;display:grid;gap:.6rem;align-content:start}
+.target h3{font-size:1.2rem}
+.target p{margin:0;color:var(--muted);font-size:.92rem}
+.status{font-family:var(--mono);font-size:.64rem;letter-spacing:.05em;color:var(--water)}
+.status.applied{color:var(--clay)}
+
+/* ---------- sites ---------- */
+.sites{display:grid;gap:clamp(1.5rem,4vw,2.6rem)}
+@media (min-width:900px){.sites{grid-template-columns:minmax(0,1.25fr) minmax(280px,.75fr)}}
+.map{position:relative;border:1px solid var(--line);background:var(--panel);padding:.75rem}
+.map img{width:100%;opacity:.22;filter:sepia(1) hue-rotate(45deg) saturate(.6) brightness(.9)}
+.pin{position:absolute;width:13px;height:13px;transform:translate(-50%,-50%);border-radius:50%;background:var(--leaf);box-shadow:0 0 0 4px rgba(155,197,61,.18);transition:transform .3s var(--ease)}
+.pin.pk{background:var(--clay);box-shadow:0 0 0 4px rgba(201,129,78,.18)}
+.pin:hover,.pin[aria-pressed="true"]{transform:translate(-50%,-50%) scale(1.35)}
+.pin-label{position:absolute;top:16px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:.6rem;color:var(--text);white-space:nowrap;background:var(--ink);border:1px solid var(--line);padding:.15rem .4rem;pointer-events:none}
+.site{border-bottom:1px solid var(--line-soft);padding:1.1rem 0;transition:opacity .35s}
+.site:first-child{border-top:1px solid var(--line)}
+.site h3{font-size:1.1rem;display:flex;align-items:baseline;gap:.6rem}
+.site h3 em{font-style:normal;font-family:var(--mono);font-size:.62rem;color:var(--muted);margin-left:auto}
+.site p{margin:.35rem 0 0;color:var(--muted);font-size:.9rem}
+.site.dim{opacity:.28}
+
+/* ---------- languages ---------- */
+.langs{display:grid;gap:1px;background:var(--line);border:1px solid var(--line)}
+@media (min-width:700px){.langs{grid-template-columns:repeat(4,1fr)}}
+.lang{background:var(--ink);padding:1.25rem 1.2rem}
+.lang b{font-family:var(--serif);font-weight:400;font-size:1.3rem;display:block;font-variation-settings:"opsz" 40}
+.lang small{display:block;color:var(--muted);font-size:.8rem;margin-top:.2rem}
+.meter{display:flex;gap:3px;margin-top:.9rem}
+.meter i{height:3px;flex:1;background:var(--line)}
+.meter i.f{background:var(--leaf)}
+
+/* ---------- photography ---------- */
+.filters{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.6rem}
+.filter{font-size:.82rem;color:var(--muted);border:1px solid var(--line);padding:.34rem .9rem;border-radius:999px;transition:.25s}
+.filter:hover{color:var(--text)}
+.filter[aria-pressed="true"]{color:var(--ink);background:var(--leaf);border-color:var(--leaf)}
+.sheet{display:grid;grid-template-columns:repeat(2,1fr);gap:.6rem}
+@media (min-width:720px){.sheet{grid-template-columns:repeat(4,1fr)}}
+.shot{position:relative;aspect-ratio:4/5;overflow:hidden;background:var(--panel-2);border:1px solid var(--line);padding:0}
+.shot img{width:100%;height:100%;object-fit:cover;opacity:.82;transition:opacity .5s,transform .9s var(--ease)}
+.shot:hover img{opacity:1;transform:scale(1.04)}
+.shot figcaption{position:absolute;left:.5rem;bottom:.5rem;font-family:var(--mono);font-size:.58rem;color:var(--text);background:rgba(11,10,9,.72);padding:.15rem .4rem;opacity:0;transition:opacity .3s}
+.shot:hover figcaption,.shot:focus-visible figcaption{opacity:1}
+.shot.hide{display:none}
+.shot.broken img{display:none}
+.shot.broken::after{content:"Image unavailable";position:absolute;inset:0;display:grid;place-items:center;font-family:var(--mono);font-size:.62rem;color:var(--muted)}
+.empty{color:var(--muted);font-size:.9rem;padding:2rem 0}
+
+/* ---------- lightbox ---------- */
+.lb{position:fixed;inset:0;z-index:100;display:none;place-items:center;padding:clamp(1rem,4vw,3rem);background:rgba(7,6,5,.94);backdrop-filter:blur(10px)}
+.lb.open{display:grid}
+.lb figure{margin:0;max-width:min(980px,100%);max-height:100%;display:grid;gap:.8rem}
+.lb img{max-height:78vh;width:auto;margin-inline:auto;border:1px solid var(--line)}
+.lb figcaption{display:flex;justify-content:space-between;gap:1rem;font-family:var(--mono);font-size:.7rem;color:var(--muted)}
+.lb-close{position:absolute;top:1rem;right:1.2rem;font-size:1.6rem;line-height:1;color:var(--muted)}
+.lb-close:hover{color:var(--text)}
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);font-size:1.6rem;color:var(--muted);padding:1rem}
+.lb-nav:hover{color:var(--leaf)}
+.lb-prev{left:.2rem}.lb-next{right:.2rem}
+
+/* ---------- footer ---------- */
+.foot{padding-block:clamp(3.5rem,8vh,6rem);border-top:1px solid var(--line)}
+.foot-grid{display:grid;gap:2rem}
+@media (min-width:820px){.foot-grid{grid-template-columns:1.2fr .8fr;align-items:end}}
+.links{display:flex;flex-wrap:wrap;gap:.6rem}
+.link{display:inline-flex;align-items:center;gap:.55rem;border:1px solid var(--line);padding:.5rem .9rem;text-decoration:none;font-size:.88rem;transition:.28s}
+.link:hover{border-color:var(--leaf);color:var(--leaf);background:var(--leaf-soft)}
+.link svg{width:15px;height:15px;fill:currentColor}
+.colophon{font-family:var(--mono);font-size:.66rem;color:var(--muted);line-height:1.8}
+</style>
 </head>
 <body>
+<div class="scrollbar" id="progress"></div>
 
-    <canvas id="network-canvas"></canvas>
-    <div class="tech-grid"></div>
+<header class="topbar">
+  <div class="brand"><i></i><b>Waleed Ramzan</b><span>TheSoilKid</span></div>
+  <nav class="navlinks" id="nav">
+    <a href="#work">What I measure</a>
+    <a href="#instrument">StomaSnap</a>
+    <a href="#ahead">Where it's heading</a>
+    <a href="#sites">Sites</a>
+    <a href="#lens">Photographs</a>
+    <a href="#contact">Contact</a>
+  </nav>
+</header>
 
-    <nav class="fixed top-0 w-full z-50 flex justify-between items-center px-6 md:px-12 py-5 border-b border-white/5 bg-[#050507]/80 backdrop-blur-md mono text-[10px] md:text-xs tracking-[0.2em] uppercase">
-        <div class="text-white font-bold tracking-widest flex items-center gap-3">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            W.RAMZAN <span class="text-emerald-500/50">v4.4-R1</span>
+<nav class="rail" id="rail" aria-label="Section marker">
+  <a href="#top"><i></i><span>Top</span></a>
+  <a href="#work"><i></i><span>Measurement</span></a>
+  <a href="#instrument"><i></i><span>Instrument</span></a>
+  <a href="#ahead"><i></i><span>Heading</span></a>
+  <a href="#sites"><i></i><span>Sites</span></a>
+  <a href="#lens"><i></i><span>Photographs</span></a>
+  <a href="#contact"><i></i><span>Contact</span></a>
+</nav>
+
+<main>
+<!-- ══════════════════ HERO ══════════════════ -->
+<section class="band hero" id="top">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="hero-meta">
+          <span class="tag live">MSc candidate, Göttingen &amp; Kassel</span>
+          <span class="tag">Soil science</span>
+          <span class="tag">Crop phenotyping</span>
         </div>
-        <div class="hidden md:flex gap-10">
-            <a href="#hero" class="hover:text-emerald-400 transition duration-300">Init</a>
-            <a href="#science" class="hover:text-emerald-400 transition duration-300">Matrix</a>
-            <a href="#lens" class="hover:text-emerald-400 transition duration-300">Lens</a>
-            <a href="#map" class="hover:text-emerald-400 transition duration-300">Nodes</a>
-        </div>
-    </nav>
+        <h1 class="display hero-name">Waleed<br><em>Ramzan</em></h1>
+        <p class="lede">I measure how crops fail before you can see it — in the soil solution, at the leaf surface, and from 80 metres up — and I build the instruments that take the measurement.</p>
 
-    <!-- Social Sidebar -->
-    <div class="fixed z-[90] bottom-6 left-1/2 -translate-x-1/2 flex flex-row gap-3 p-3 glass-panel rounded-full md:left-auto md:right-8 md:top-1/2 md:-translate-y-1/2 md:translate-x-0 md:flex-col md:rounded-2xl md:p-4 md:gap-6">
-        <a href="https://linkedin.com/in/waleedramzan" aria-label="LinkedIn" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:text-emerald-400 hover:border-emerald-400 hover:bg-emerald-400/10 transition-all duration-300">
-            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-        </a>
-        <a href="https://scholar.google.com/citations?user=Jm5Vp_oAAAAJ&hl=en" aria-label="Google Scholar" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:text-emerald-400 hover:border-emerald-400 hover:bg-emerald-400/10 transition-all duration-300">
-            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 24a7 7 0 1 1 0-14 7 7 0 0 1 0 14zm0-24L0 9.5l4.838 2.735c-.078.435-.152.888-.152 1.411 0 2.923 2.196 5.568 5.615 6.784l-.841 1.543c-1.391-.122-2.827-.585-4.045-1.428l-1.071 1.706C5.975 23.363 8.761 24 12 24s6.025-.637 7.656-1.749l-1.071-1.706c-1.218.843-2.654 1.306-4.045 1.428l-.841-1.543c3.419-1.216 5.615-3.861 5.615-6.784 0-.523-.074-.976-.152-1.411L24 9.5 12 0z"/></svg>
-        </a>
-        <a href="https://www.instagram.com/thesoilkid" aria-label="Instagram" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:text-emerald-400 hover:border-emerald-400 hover:bg-emerald-400/10 transition-all duration-300">
-            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073z"/></svg>
-        </a>
+        <div class="figures">
+          <div class="fig"><b class="tnum">&gt;95%</b><span>Accuracy of the stomata detector against manual counts</span></div>
+          <div class="fig"><b class="tnum">7 → 1</b><span>Days to process one imaging dataset, after automation</span></div>
+          <div class="fig"><b class="tnum">52</b><span>Qualification gates on the current instrument build</span></div>
+        </div>
+      </div>
+
+      <figure style="margin:0">
+        <svg class="section-svg" viewBox="0 0 440 600" role="img" aria-labelledby="svgttl svgdesc">
+          <title id="svgttl">Cross-section from canopy to rhizosphere</title>
+          <desc id="svgdesc">A maize plant drawn above four soil horizons, with an inset microscope view of stomata on the leaf surface.</desc>
+
+          <!-- soil horizons -->
+          <g class="fade-in">
+            <rect x="0" y="250" width="440" height="62" fill="#251C15"/>
+            <rect x="0" y="312" width="440" height="96" fill="#2E2319"/>
+            <rect x="0" y="408" width="440" height="90" fill="#241A13"/>
+            <rect x="0" y="498" width="440" height="102" fill="#191210"/>
+            <g fill="#C9814E" opacity=".16">
+              <circle cx="46" cy="286" r="2.2"/><circle cx="118" cy="300" r="1.6"/><circle cx="205" cy="274" r="2.6"/>
+              <circle cx="288" cy="296" r="1.8"/><circle cx="366" cy="268" r="2.2"/><circle cx="402" cy="304" r="1.5"/>
+              <circle cx="74" cy="352" r="1.8"/><circle cx="166" cy="378" r="2.4"/><circle cx="262" cy="344" r="1.7"/>
+              <circle cx="344" cy="386" r="2.1"/><circle cx="412" cy="358" r="1.6"/><circle cx="96" cy="440" r="2"/>
+              <circle cx="214" cy="462" r="1.7"/><circle cx="330" cy="436" r="2.3"/><circle cx="398" cy="472" r="1.6"/>
+              <circle cx="60" cy="530" r="1.9"/><circle cx="236" cy="548" r="1.5"/><circle cx="356" cy="522" r="2"/>
+            </g>
+            <line x1="0" y1="250" x2="440" y2="250" stroke="#C9814E" stroke-width="1" opacity=".5"/>
+            <line x1="0" y1="312" x2="440" y2="312" stroke="#0B0A09" stroke-width="1" opacity=".5" stroke-dasharray="5 7"/>
+            <line x1="0" y1="408" x2="440" y2="408" stroke="#0B0A09" stroke-width="1" opacity=".5" stroke-dasharray="5 7"/>
+            <line x1="0" y1="498" x2="440" y2="498" stroke="#0B0A09" stroke-width="1" opacity=".5" stroke-dasharray="5 7"/>
+          </g>
+
+          <!-- depth scale -->
+          <g class="fade-in" font-family="IBM Plex Mono, monospace" font-size="9" fill="#9C9084">
+            <line x1="418" y1="250" x2="418" y2="560" stroke="#9C9084" stroke-width=".6" opacity=".5"/>
+            <g stroke="#9C9084" stroke-width=".6" opacity=".5">
+              <line x1="414" y1="250" x2="422" y2="250"/><line x1="414" y1="312" x2="422" y2="312"/>
+              <line x1="414" y1="374" x2="422" y2="374"/><line x1="414" y1="436" x2="422" y2="436"/>
+              <line x1="414" y1="498" x2="422" y2="498"/><line x1="414" y1="560" x2="422" y2="560"/>
+            </g>
+            <text x="410" y="246" text-anchor="end">0 cm</text>
+            <text x="410" y="316" text-anchor="end">20</text>
+            <text x="410" y="378" text-anchor="end">40</text>
+            <text x="410" y="440" text-anchor="end">60</text>
+            <text x="410" y="502" text-anchor="end">80</text>
+            <text x="410" y="564" text-anchor="end">100</text>
+          </g>
+
+          <!-- plant -->
+          <g fill="none" stroke="#9BC53D" stroke-width="2" stroke-linecap="round" pathLength="1">
+            <path class="draw" d="M150,250 C148,200 152,150 150,92"/>
+            <g stroke-width="1.4" opacity=".9">
+              <path class="draw d2" d="M150,92 L138,66"/><path class="draw d2" d="M150,92 L150,60"/><path class="draw d2" d="M150,92 L163,68"/>
+            </g>
+          </g>
+          <g fill="#9BC53D" fill-opacity=".13" stroke="#9BC53D" stroke-width="1.4" class="fade-in">
+            <path d="M150,120 C180,100 205,95 232,70 C216,106 185,130 150,132 Z"/>
+            <path d="M150,152 C120,134 95,130 66,106 C86,142 116,162 150,164 Z"/>
+            <path d="M150,186 C186,173 216,173 246,156 C222,193 188,206 150,201 Z"/>
+            <path d="M150,216 C118,206 92,206 60,193 C88,229 120,239 150,233 Z"/>
+          </g>
+
+          <!-- roots -->
+          <g fill="none" stroke="#C9814E" stroke-width="1.5" stroke-linecap="round" opacity=".85" pathLength="1">
+            <path class="draw d2" d="M150,250 C152,302 144,344 150,396"/>
+            <path class="draw d3" d="M150,272 C120,292 100,312 78,334"/>
+            <path class="draw d3" d="M150,300 C182,318 206,338 230,356"/>
+            <path class="draw d4" d="M150,332 C126,354 112,378 100,410"/>
+            <path class="draw d4" d="M150,358 C176,380 190,402 200,430"/>
+            <g stroke-width=".9" opacity=".7">
+              <path class="draw d4" d="M104,344 C96,356 92,366 90,378"/>
+              <path class="draw d4" d="M206,342 C214,354 218,364 220,376"/>
+              <path class="draw d4" d="M150,396 C146,414 148,428 152,442"/>
+            </g>
+          </g>
+
+          <!-- microscope inset -->
+          <g class="fade-in">
+            <circle cx="330" cy="132" r="74" fill="#0E120B" stroke="#2E241B" stroke-width="1.5"/>
+            <circle cx="330" cy="132" r="74" fill="#9BC53D" fill-opacity=".05"/>
+            <g stroke="#9BC53D" stroke-opacity=".22" stroke-width=".8">
+              <path d="M262,112 C300,120 350,118 396,108" fill="none"/>
+              <path d="M260,150 C300,158 352,156 398,148" fill="none"/>
+            </g>
+            <g fill="none" stroke="#9BC53D" stroke-width="1.5">
+              <g transform="translate(305,104) rotate(-16)">
+                <ellipse rx="25" ry="13" stroke-opacity=".75"/>
+                <ellipse rx="13" ry="4.6" fill="#9BC53D" fill-opacity=".5" stroke="none"/>
+              </g>
+              <g transform="translate(356,158) rotate(-16)">
+                <ellipse rx="25" ry="13" stroke-opacity=".95"/>
+                <ellipse class="pore" rx="13" ry="5.4" fill="#9BC53D" fill-opacity=".65" stroke="none"/>
+              </g>
+              <g transform="translate(300,178) rotate(-16)">
+                <ellipse rx="25" ry="13" stroke-opacity=".6"/>
+                <ellipse rx="13" ry="3.2" fill="#9BC53D" fill-opacity=".35" stroke="none"/>
+              </g>
+            </g>
+            <g font-family="IBM Plex Mono, monospace" font-size="8.5" fill="#9C9084">
+              <line x1="286" y1="196" x2="330" y2="196" stroke="#9C9084" stroke-width="1"/>
+              <line x1="286" y1="193" x2="286" y2="199" stroke="#9C9084" stroke-width="1"/>
+              <line x1="330" y1="193" x2="330" y2="199" stroke="#9C9084" stroke-width="1"/>
+              <text x="336" y="199">50 µm</text>
+              <text x="256" y="60">leaf surface, 520–530 nm</text>
+            </g>
+          </g>
+        </svg>
+        <figcaption class="data" style="margin-top:.7rem">Green episcopic illumination at the leaf surface; roots and soil horizons to one metre.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ WORK ══════════════════ -->
+<section class="band" id="work">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 class="sec-title">What I measure, and where</h2>
+      <p>The same question — how is this crop coping — asked at three depths. Open a row to see the methods and the hardware behind it.</p>
     </div>
 
-    <div class="snap-container" id="main-scroll">
-        
-        <!-- HERO -->
-        <section id="hero" class="snap-section p-6 md:p-24 pt-28 md:pt-32 pb-24 md:pb-24">
-            <div class="max-w-6xl">
-                <div class="mono text-emerald-400 text-xs tracking-[0.3em] uppercase mb-8 reveal flex items-center gap-4">
-                    <span class="w-8 h-[1px] bg-emerald-400"></span> System Initialization Complete
-                </div>
-                <h1 class="serif text-[5rem] md:text-[10rem] lg:text-[13rem] leading-[0.8] tracking-tighter reveal glow-text">
-                    Waleed<br><span class="italic text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-500">Ramzan.</span>
-                </h1>
-                <p class="mt-8 md:mt-14 text-lg md:text-2xl lg:text-3xl font-light text-zinc-300 max-w-4xl leading-relaxed reveal" style="transition-delay: 0.2s;">
-                    Elite Scientific Advisor & Mechatronics Architect. Executing a unified <span class="text-white font-medium">Soil-to-Plant-to-Canopy</span> data pipeline bridging rhizosphere biogeochemistry, high-throughput phenotyping, and programmatic spatial modeling to isolate sub-visual environmental stress.
-                </p>
-            </div>
-        </section>
+    <!-- CANOPY -->
+    <div class="horizon">
+      <div class="horizon-bar">
+        <span class="swatch" style="background:#6FA8C4"></span>
+        <h3>From above</h3>
+        <span class="horizon-range">+20 to +120 m</span>
+      </div>
 
-        <!-- EXPERTISE MATRIX -->
-        <section id="science" class="snap-section p-6 md:p-24 pt-28 md:pt-32 pb-28 md:pb-24 relative">
-            <div class="mb-10 md:mb-16 reveal flex flex-col md:flex-row md:items-end justify-between border-b border-white/10 pb-6 max-w-7xl">
-                <h2 class="serif text-5xl md:text-7xl tracking-tight text-white">The Expertise Matrix</h2>
-                <span class="mono text-[10px] tracking-[0.2em] uppercase text-emerald-400 mt-4 md:mt-0 opacity-80">[ STATUS: OPERATIONAL ]</span>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 max-w-7xl w-full">
-                
-                <button onclick="openModal('biogeochem')" class="premium-card glass-panel text-left p-8 rounded-2xl reveal flex flex-col justify-between min-h-[180px]" style="transition-delay: 0.1s;">
-                    <div>
-                        <span class="mono text-emerald-500/70 text-[10px] tracking-[0.2em] uppercase mb-4 block flex justify-between"><span>NODE 01</span></span>
-                        <h3 class="serif text-3xl text-white mb-3 font-normal">Rhizosphere Chemistry</h3>
-                    </div>
-                    <p class="text-sm font-light text-zinc-400 leading-relaxed">AAS, UV-Vis, 87Sr/86Sr Tracing (ICP-OES/MS), Adsorption-Desorption Kinetics.</p>
-                </button>
+      <div class="row">
+        <button class="row-head" aria-expanded="false" aria-controls="p1">
+          <span class="row-depth">+80 m</span>
+          <span><span class="row-title">Drone survey and vegetation indices</span><span class="row-sum">Flight planning through to plot-level NDVI and NDRE</span></span>
+          <span class="row-mark" aria-hidden="true"></span>
+        </button>
+        <div class="row-body" id="p1"><div><div class="row-inner">
+          <div class="chips"><span class="chip">UAV flight planning</span><span class="chip">Multispectral</span><span class="chip">NDVI / NDRE</span></div>
+          <p>Planning multispectral flights over trial plots, then pulling vegetation indices back down to the plot and plant level. The point is to find the rows that are already struggling while the canopy still looks uniform to the eye.</p>
+        </div></div></div>
+      </div>
 
-                <button onclick="openModal('physio')" class="premium-card glass-panel text-left p-8 rounded-2xl reveal flex flex-col justify-between min-h-[180px]" style="transition-delay: 0.15s;">
-                    <div>
-                        <span class="mono text-emerald-500/70 text-[10px] tracking-[0.2em] uppercase mb-4 block flex justify-between"><span>NODE 02</span></span>
-                        <h3 class="serif text-3xl text-white mb-3 font-normal">Plant Physiology</h3>
-                    </div>
-                    <p class="text-sm font-light text-zinc-400 leading-relaxed">LI-6800 Portable Photosynthesis, ultra-HPLC, GC Regulatory Pesticide QC.</p>
-                </button>
-
-                <button onclick="openModal('cv')" class="premium-card glass-panel text-left p-8 rounded-2xl reveal flex flex-col justify-between min-h-[180px]" style="transition-delay: 0.2s;">
-                    <div>
-                        <span class="mono text-emerald-500/70 text-[10px] tracking-[0.2em] uppercase mb-4 block flex justify-between"><span>NODE 03</span></span>
-                        <h3 class="serif text-3xl text-white mb-3 font-normal">Optical Phenotyping</h3>
-                    </div>
-                    <p class="text-sm font-light text-zinc-400 leading-relaxed">Episcopic Green Hyperspectral, AI Stomata Detection (>95% Accuracy).</p>
-                </button>
-
-                <button onclick="openModal('mechatronics')" class="premium-card glass-panel text-left p-8 rounded-2xl reveal flex flex-col justify-between min-h-[180px]" style="transition-delay: 0.25s;">
-                    <div>
-                        <span class="mono text-emerald-500/70 text-[10px] tracking-[0.2em] uppercase mb-4 block flex justify-between"><span>NODE 04</span></span>
-                        <h3 class="serif text-3xl text-white mb-3 font-normal">Edge Mechatronics</h3>
-                    </div>
-                    <p class="text-sm font-light text-zinc-400 leading-relaxed">Raspberry Pi 5, ESP32-S3, StomaSnap v4.4-R1 Architecture, I2C Arrays.</p>
-                </button>
-
-                <button onclick="openModal('geo')" class="premium-card glass-panel text-left p-8 rounded-2xl reveal flex flex-col justify-between min-h-[180px]" style="transition-delay: 0.3s;">
-                    <div>
-                        <span class="mono text-emerald-500/70 text-[10px] tracking-[0.2em] uppercase mb-4 block flex justify-between"><span>NODE 05</span></span>
-                        <h3 class="serif text-3xl text-white mb-3 font-normal">Geospatial Analytics</h3>
-                    </div>
-                    <p class="text-sm font-light text-zinc-400 leading-relaxed">UAV Flight Planning, IDW/Kriging, Programmatic Python Data Cubes.</p>
-                </button>
-
-                <button onclick="openModal('lead')" class="premium-card glass-panel text-left p-8 rounded-2xl reveal flex flex-col justify-between min-h-[180px]" style="transition-delay: 0.35s;">
-                    <div>
-                        <span class="mono text-emerald-500/70 text-[10px] tracking-[0.2em] uppercase mb-4 block flex justify-between"><span>NODE 06</span></span>
-                        <h3 class="serif text-3xl text-white mb-3 font-normal">Strategic Leadership</h3>
-                    </div>
-                    <p class="text-sm font-light text-zinc-400 leading-relaxed">PhenoRob/KOSI Trajectory, ZALF (Ref. 38-2026), Deutschlandstipendium.</p>
-                </button>
-
-            </div>
-        </section>
-
-        <!-- OPERATIONAL DIRECTIVES -->
-        <section id="notes" class="snap-section p-6 md:p-24 pt-28 md:pt-32 pb-28 md:pb-24">
-            <h2 class="serif text-5xl md:text-6xl lg:text-7xl mb-12 md:mb-16 reveal text-white">Operational Directives</h2>
-            
-            <ul class="space-y-10 md:space-y-14 max-w-5xl reveal" style="transition-delay: 0.2s;">
-                <li class="flex items-start gap-6 group relative z-20 glass-panel p-8 rounded-2xl border-l-4 border-emerald-500 hover:bg-white/5 transition">
-                    <div>
-                        <span class="mono text-emerald-400 text-[10px] tracking-[0.2em] uppercase block mb-3">Hardware Protocol — StomaSnap v4.4-R1</span>
-                        <p class="text-lg md:text-xl font-light leading-relaxed text-zinc-200">"Executing the 52-gate qualification register (P, M, OQ, SQ series). Validating the OQ12 biological non-perturbation closure-kinetics under a strict 15-second thigmonastic clamp constraint."</p>
-                    </div>
-                </li>
-                
-                <li class="flex items-start gap-6 group relative z-20 glass-panel p-8 rounded-2xl border-l-4 border-cyan-500 hover:bg-white/5 transition">
-                    <div>
-                        <span class="mono text-cyan-400 text-[10px] tracking-[0.2em] uppercase block mb-3">Software Architecture — Open-Science Python</span>
-                        <p class="text-lg md:text-xl font-light leading-relaxed text-zinc-200">"Transitioning strictly to programmatic workflows (geopandas, xarray). Enforcing explicit schema contracts, append-and-flush transactional writes, and deterministic seeds across all spatial modeling."</p>
-                    </div>
-                </li>
-
-                <li class="flex items-start gap-6 group relative z-20 glass-panel p-8 rounded-2xl border-l-4 border-indigo-500 hover:bg-white/5 transition">
-                    <div>
-                        <span class="mono text-indigo-400 text-[10px] tracking-[0.2em] uppercase block mb-3">Biostatistical Precision — Field Analytics</span>
-                        <p class="text-lg md:text-xl font-light leading-relaxed text-zinc-200">"Always aggregate to plant-level means before evaluating p-values to eliminate pseudoreplication. Always explicitly model Vapor Pressure Deficit (VPD) as an active environmental covariate."</p>
-                    </div>
-                </li>
-            </ul>
-        </section>
-
-        <!-- PHOTOGRAPHY / LENS -->
-        <section id="lens" class="snap-section p-6 md:p-24 pt-28 md:pt-32 pb-28 md:pb-24">
-            <h2 class="serif text-5xl md:text-6xl lg:text-7xl mb-8 md:mb-12 reveal text-white">@weedslens</h2>
-            <div class="flex flex-wrap gap-4 md:gap-8 mb-10 text-[10px] md:text-xs tracking-[0.2em] uppercase text-zinc-400 mono reveal" style="transition-delay: 0.1s;">
-                <button onclick="filterPhotos('all')" class="hover:text-white transition hover:bg-white/10 px-4 py-2 rounded-full border border-transparent hover:border-white/20">All</button>
-                <button onclick="filterPhotos('landscape')" class="hover:text-white transition hover:bg-white/10 px-4 py-2 rounded-full border border-transparent hover:border-white/20">Landscape</button>
-                <button onclick="filterPhotos('portraits')" class="hover:text-white transition hover:bg-white/10 px-4 py-2 rounded-full border border-transparent hover:border-white/20">Portraits</button>
-                <button onclick="filterPhotos('animals')" class="hover:text-white transition hover:bg-white/10 px-4 py-2 rounded-full border border-transparent hover:border-white/20">Animals</button>
-            </div>
-            <div id="photo-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 h-auto w-full max-w-7xl reveal relative z-20" style="transition-delay: 0.2s;">
-                <div data-category="landscape" class="aspect-[4/5] glass-panel rounded-xl overflow-hidden group"><img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=600" alt="Landscape" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-110 transition duration-700"></div>
-                <div data-category="portraits" class="aspect-[4/5] glass-panel rounded-xl overflow-hidden group"><img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=600" alt="Portrait" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-110 transition duration-700"></div>
-                <div data-category="animals" class="aspect-[4/5] glass-panel rounded-xl overflow-hidden group"><img src="https://images.unsplash.com/photo-1474511320723-9a56873867b5?q=80&w=600" alt="Animal" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-110 transition duration-700"></div>
-                <div data-category="landscape" class="aspect-[4/5] glass-panel rounded-xl overflow-hidden group"><img src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?q=80&w=600" alt="Frame" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-110 transition duration-700"></div>
-            </div>
-        </section>
-
-        <!-- LEXICON -->
-        <section id="lexicon" class="snap-section p-6 md:p-24 pt-28 md:pt-32 pb-28 md:pb-24">
-            <h2 class="serif text-5xl md:text-6xl lg:text-7xl mb-12 md:mb-16 reveal text-white">The Lexicon</h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-7xl relative z-20">
-                <div class="glass-panel p-8 rounded-2xl reveal border-t-2 border-t-emerald-500" style="transition-delay: 0.1s;">
-                    <span class="block mono text-emerald-400 mb-4 text-[10px] md:text-xs tracking-[0.2em] uppercase">Native</span>
-                    <span class="font-light text-xl text-white">Urdu<br>Saraiki<br>Punjabi</span>
-                </div>
-                <div class="glass-panel p-8 rounded-2xl reveal border-t-2 border-t-cyan-500" style="transition-delay: 0.2s;">
-                    <span class="block mono text-cyan-400 mb-4 text-[10px] md:text-xs tracking-[0.2em] uppercase">C1 / C2</span>
-                    <span class="font-light text-xl text-white">English<br><span class="text-sm opacity-50 block mt-2 mono">IELTS 7.5</span></span>
-                </div>
-                <div class="glass-panel p-8 rounded-2xl reveal border-t-2 border-t-indigo-500" style="transition-delay: 0.3s;">
-                    <span class="block mono text-indigo-400 mb-4 text-[10px] md:text-xs tracking-[0.2em] uppercase">HSK 2</span>
-                    <span class="font-light text-xl text-white">Chinese<br><span class="text-sm opacity-50 block mt-2 mono">Shenyang Normal Univ.</span></span>
-                </div>
-                <div class="glass-panel p-8 rounded-2xl reveal border-t-2 border-t-zinc-500" style="transition-delay: 0.4s;">
-                    <span class="block mono text-zinc-400 mb-4 text-[10px] md:text-xs tracking-[0.2em] uppercase">A2</span>
-                    <span class="font-light text-xl text-white">German<br><span class="text-sm opacity-50 block mt-2 mono">Working Proficiency</span></span>
-                </div>
-            </div>
-        </section>
-
-        <!-- CARTOGRAPHY / MAP -->
-        <section id="map" class="snap-section p-6 md:p-24 pt-28 md:pt-32 pb-32 md:pb-24">
-            <h2 class="serif text-5xl md:text-6xl lg:text-7xl mb-8 md:mb-12 text-center reveal text-white">Global Deployment Nodes</h2>
-            
-            <div class="relative w-full max-w-5xl mx-auto reveal glass-panel rounded-3xl p-4 md:p-8 overflow-hidden" style="transition-delay: 0.2s;">
-                <!-- Minimal Outline Map for Tech Aesthetic -->
-                <img src="https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg" alt="Global Node Map" class="w-full h-auto block opacity-15 pointer-events-none drop-shadow-2xl min-w-[500px]" style="filter: sepia(1) hue-rotate(140deg) saturate(3) brightness(0.7);">
-
-                <!-- Glowing Pings -->
-                <button class="absolute top-[22%] left-[51%] -translate-x-1/2 -translate-y-1/2 w-2 h-2 md:w-3 md:h-3 bg-emerald-400 rounded-full cursor-pointer hover:scale-150 transition-transform duration-300 z-10 group" aria-label="Göttingen"
-                     onclick="openLocation('Göttingen & Witzenhausen', 'Universität Göttingen und Universität Kassel.<br><br>Joint M.Sc. Candidate. Graduate Student Assistant for the DFG-funded SP2 MultiStress Project under Dr. Irsa Ejaz (hyperspectral imagery cubes) and the TRIO One Health Project.')">
-                    <div class="absolute inset-0 bg-emerald-400 animate-ping rounded-full opacity-75"></div>
-                    <span class="absolute top-6 left-1/2 -translate-x-1/2 mono text-[10px] bg-black/80 backdrop-blur border border-emerald-500/30 px-3 py-1.5 opacity-0 group-hover:opacity-100 transition whitespace-nowrap text-emerald-100 rounded">NODE: GÖTTINGEN</span>
-                </button>
-
-                <button class="absolute top-[20%] left-[53%] -translate-x-1/2 -translate-y-1/2 w-2 h-2 md:w-2.5 md:h-2.5 bg-cyan-400 rounded-full cursor-pointer hover:scale-150 transition-transform duration-300 z-10 group" aria-label="Müncheberg"
-                     onclick="openLocation('Müncheberg, Germany', 'ZALF - Leibniz Centre for Agricultural Landscape Research.<br><br>Strategic target vector (Ref. 38-2026) for the RSI/ECO investigation into plant acquisition of water and nitrogen under drought conditions.')">
-                    <div class="absolute inset-0 bg-cyan-400 animate-ping rounded-full opacity-75" style="animation-delay: 0.2s;"></div>
-                    <span class="absolute top-6 left-1/2 -translate-x-1/2 mono text-[10px] bg-black/80 backdrop-blur border border-cyan-500/30 px-3 py-1.5 opacity-0 group-hover:opacity-100 transition whitespace-nowrap text-cyan-100 rounded">NODE: MÜNCHEBERG</span>
-                </button>
-
-                <button class="absolute top-[21%] left-[52%] -translate-x-1/2 -translate-y-1/2 w-2 h-2 md:w-2.5 md:h-2.5 bg-indigo-400 rounded-full cursor-pointer hover:scale-150 transition-transform duration-300 z-10 group" aria-label="Potsdam"
-                     onclick="openLocation('Potsdam, Germany', 'PIK - Potsdam Institute for Climate Impact Research.<br><br>Participated in the I31 Sustainable Land Use and Climate Mitigation course, engaging directly with field-leading experts on global MAgPIE land-use models.')">
-                    <div class="absolute inset-0 bg-indigo-400 animate-ping rounded-full opacity-75" style="animation-delay: 0.4s;"></div>
-                    <span class="absolute top-6 left-1/2 -translate-x-1/2 mono text-[10px] bg-black/80 backdrop-blur border border-indigo-500/30 px-3 py-1.5 opacity-0 group-hover:opacity-100 transition whitespace-nowrap text-indigo-100 rounded">NODE: POTSDAM</span>
-                </button>
-
-                <button class="absolute top-[38%] left-[67%] -translate-x-1/2 -translate-y-1/2 w-2 h-2 md:w-3 md:h-3 bg-rose-400 rounded-full cursor-pointer hover:scale-150 transition-transform duration-300 z-10 group" aria-label="Multan"
-                     onclick="openLocation('Multan, Pakistan', 'Bahauddin Zakariya University.<br><br>B.Sc. (Hons.) Agriculture (Soil Science). Research Assistant for HEC-NRPU Project No. 17027 under Dr. Shahid Hussain modeling multi-element wastewater irrigation kinetics.')">
-                    <div class="absolute inset-0 bg-rose-400 animate-ping rounded-full opacity-75" style="animation-delay: 0.6s;"></div>
-                    <span class="absolute top-6 left-1/2 -translate-x-1/2 mono text-[10px] bg-black/80 backdrop-blur border border-rose-500/30 px-3 py-1.5 opacity-0 group-hover:opacity-100 transition whitespace-nowrap text-rose-100 rounded">NODE: MULTAN</span>
-                </button>
-
-                <button class="absolute top-[37%] left-[68%] -translate-x-1/2 -translate-y-1/2 w-2 h-2 md:w-3 md:h-3 bg-amber-400 rounded-full cursor-pointer hover:scale-150 transition-transform duration-300 z-10 group" aria-label="Faisalabad"
-                     onclick="openLocation('Punjab, Pakistan', 'Ministry of Agriculture.<br><br>Interned at the Pesticide Quality Control Laboratory. Validated regulatory compliance across 27 coded active ingredients executing intensive HPLC/uHPLC platforms.')">
-                    <div class="absolute inset-0 bg-amber-400 animate-ping rounded-full opacity-75" style="animation-delay: 0.8s;"></div>
-                    <span class="absolute top-6 left-1/2 -translate-x-1/2 mono text-[10px] bg-black/80 backdrop-blur border border-amber-500/30 px-3 py-1.5 opacity-0 group-hover:opacity-100 transition whitespace-nowrap text-amber-100 rounded">NODE: PUNJAB</span>
-                </button>
-            </div>
-            <p class="text-center mt-8 md:mt-12 mono uppercase tracking-[0.2em] text-[10px] md:text-xs text-zinc-500 reveal">Access active coordinates for operational history</p>
-        </section>
+      <div class="row">
+        <button class="row-head" aria-expanded="false" aria-controls="p2">
+          <span class="row-depth">map scale</span>
+          <span><span class="row-title">Interpolation and spatial data cubes</span><span class="row-sum">Out of the GIS click-path and into Python</span></span>
+          <span class="row-mark" aria-hidden="true"></span>
+        </button>
+        <div class="row-body" id="p2"><div><div class="row-inner">
+          <div class="chips"><span class="chip">geopandas</span><span class="chip">rasterio</span><span class="chip">xarray</span><span class="chip">shapely</span><span class="chip">IDW / kriging</span></div>
+          <p>I moved my spatial work out of ArcGIS Pro and into scripted pipelines. Regional and city-scale interpolation with inverse distance weighting and kriging, stacked as data cubes so a result can be rebuilt from a clean checkout instead of remembered as a sequence of clicks.</p>
+        </div></div></div>
+      </div>
     </div>
 
-    <!-- Precision Data Modal -->
-    <div id="modal" role="dialog" aria-modal="true" class="fixed inset-0 z-[150] modal-glass hidden flex items-center justify-center p-4 md:p-6 opacity-0 transition-opacity duration-300 overflow-hidden">
-        <div class="max-w-4xl w-full h-auto max-h-[85vh] glass-panel border border-white/10 rounded-3xl relative flex flex-col shadow-2xl overflow-hidden">
-            <div class="w-full flex justify-between items-center px-8 py-5 border-b border-white/10 bg-black/40 mono">
-                <span class="text-xs text-emerald-400 tracking-widest uppercase flex items-center gap-2">
-                    <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                    DATA ENTRY <span id="modal-id-tag" class="text-white"></span>
-                </span>
-                <button aria-label="Close modal" onclick="closeModal()" class="text-zinc-400 hover:text-white text-2xl leading-none transition">&times;</button>
-            </div>
-            <div id="modal-content-area" class="w-full flex-1 min-h-0 overflow-y-auto bg-black/20"></div>
+    <!-- LEAF -->
+    <div class="horizon">
+      <div class="horizon-bar">
+        <span class="swatch" style="background:#9BC53D"></span>
+        <h3>At the leaf</h3>
+        <span class="horizon-range">+0.4 to +2 m</span>
+      </div>
+
+      <div class="row">
+        <button class="row-head" aria-expanded="false" aria-controls="p3">
+          <span class="row-depth">+1.2 m</span>
+          <span><span class="row-title">Gas exchange and fluorescence</span><span class="row-sum">LI-6800, drought and frost stress before symptoms</span></span>
+          <span class="row-mark" aria-hidden="true"></span>
+        </button>
+        <div class="row-body" id="p3"><div><div class="row-inner">
+          <div class="chips"><span class="chip">LI-6800</span><span class="chip">Stomatal conductance</span><span class="chip">Chlorophyll fluorescence</span></div>
+          <p>Running the LI-6800 portable photosynthesis system on maize and tracking assimilation, conductance and fluorescence through a stress episode. These curves usually move days before anything shows up in a photograph of the plot.</p>
+        </div></div></div>
+      </div>
+
+      <div class="row">
+        <button class="row-head" aria-expanded="false" aria-controls="p4">
+          <span class="row-depth">50 µm</span>
+          <span><span class="row-title">Stomata detection by machine learning</span><span class="row-sum">Replaced manual counting; one week of work became one day</span></span>
+          <span class="row-mark" aria-hidden="true"></span>
+        </button>
+        <div class="row-body" id="p4"><div><div class="row-inner">
+          <div class="chips"><span class="chip">Object detection</span><span class="chip">&gt;95% accuracy</span><span class="chip">Non-destructive</span></div>
+          <p>A detection pipeline that counts and measures stomata in microscope imagery without a person at the eyepiece. It agrees with manual counts above 95% of the time and cut dataset turnaround from roughly seven days to one, which is what made high-throughput sampling realistic for a single researcher.</p>
+        </div></div></div>
+      </div>
+
+      <div class="row">
+        <button class="row-head" aria-expanded="false" aria-controls="p5">
+          <span class="row-depth">520 nm</span>
+          <span><span class="row-title">Episcopic hyperspectral imaging</span><span class="row-sum">Cross-polarised green reflected light on living tissue</span></span>
+          <span class="row-mark" aria-hidden="true"></span>
+        </button>
+        <div class="row-body" id="p5"><div><div class="row-inner">
+          <div class="chips"><span class="chip">Cross-polarised</span><span class="chip">520–530 nm</span><span class="chip">Hyperspectral cubes</span></div>
+          <p>Coaxial reflected-light imaging in the 520–530 nm band, cross-polarised to kill the specular sheen off a wet leaf. Paired with chlorophyll fluorescence it maps physiological state across the blade while the leaf is still on the plant.</p>
+          <p>Hyperspectral cube handling for the DFG-funded MultiStress subproject in Göttingen.</p>
+        </div></div></div>
+      </div>
+
+      <div class="row">
+        <button class="row-head" aria-expanded="false" aria-controls="p6">
+          <span class="row-depth">in hand</span>
+          <span><span class="row-title">Field instruments and edge computing</span><span class="row-sum">Sensor networks that work with no signal and no mains</span></span>
+          <span class="row-mark" aria-hidden="true"></span>
+        </button>
+        <div class="row-body" id="p6"><div><div class="row-inner">
+          <div class="chips"><span class="chip">Raspberry Pi 5</span><span class="chip">ESP32-S3</span><span class="chip">RP2040-Zero</span><span class="chip">I²C / SPI</span><span class="chip">TCA9548A</span><span class="chip">16-bit ADC</span></div>
+          <p>Mixed sensor stacks on Pi 5, ESP32-S3 and RP2040-Zero: resolving I²C address collisions with multiplexers, adding 16-bit ADCs where the onboard converter is not good enough, and writing everything offline-first so a dropped connection in a field never costs a morning of data.</p>
+        </div></div></div>
+      </div>
+    </div>
+
+    <!-- SOIL -->
+    <div class="horizon">
+      <div class="horizon-bar">
+        <span class="swatch" style="background:#C9814E"></span>
+        <h3>In the soil</h3>
+        <span class="horizon-range">0 to −90 cm</span>
+      </div>
+
+      <div class="row">
+        <button class="row-head" aria-expanded="false" aria-controls="p7">
+          <span class="row-depth">−15 cm</span>
+          <span><span class="row-title">Soil and plant chemistry</span><span class="row-sum">Digestion, spectrometry, isotope sample preparation</span></span>
+          <span class="row-mark" aria-hidden="true"></span>
+        </button>
+        <div class="row-body" id="p7"><div><div class="row-inner">
+          <div class="chips"><span class="chip">AAS</span><span class="chip">Flame photometry</span><span class="chip">UV-Vis</span><span class="chip">⁸⁷Sr/⁸⁶Sr</span><span class="chip">ICP-OES / MS</span></div>
+          <p>Acid digestion protocols, element calibration and routine operation of atomic absorption, flame photometry and UV-Vis. Sample preparation for strontium isotope tracing (⁸⁷Sr/⁸⁶Sr) run on ICP-OES and ICP-MS.</p>
+        </div></div></div>
+      </div>
+
+      <div class="row">
+        <button class="row-head" aria-expanded="false" aria-controls="p8">
+          <span class="row-depth">−30 cm</span>
+          <span><span class="row-title">Adsorption and desorption kinetics</span><span class="row-sum">Competitive heavy metal(loid) co-contamination</span></span>
+          <span class="row-mark" aria-hidden="true"></span>
+        </button>
+        <div class="row-body" id="p8"><div><div class="row-inner">
+          <div class="chips"><span class="chip">Pseudo-second-order</span><span class="chip">Langmuir</span><span class="chip">Freundlich</span></div>
+          <p>Batch experiments on soils carrying more than one contaminant at once, fitted with pseudo-second-order kinetics and non-linear equilibrium isotherms. Started as a research assistant on HEC-NRPU project 17027 in Multan, modelling multi-element wastewater irrigation.</p>
+        </div></div></div>
+      </div>
+
+      <div class="row">
+        <button class="row-head" aria-expanded="false" aria-controls="p9">
+          <span class="row-depth">lab</span>
+          <span><span class="row-title">Pesticide residue quality control</span><span class="row-sum">27 coded active ingredients, regulatory chromatography</span></span>
+          <span class="row-mark" aria-hidden="true"></span>
+        </button>
+        <div class="row-body" id="p9"><div><div class="row-inner">
+          <div class="chips"><span class="chip">uHPLC</span><span class="chip">HPLC</span><span class="chip">GC</span></div>
+          <p>Quality control work at the Pesticide Quality Control Laboratory of the Punjab Ministry of Agriculture: running uHPLC, HPLC and gas chromatography to check whether products on the market match what their label claims, across 27 coded active ingredients.</p>
+        </div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ INSTRUMENT ══════════════════ -->
+<section class="band" id="instrument">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 class="sec-title">StomaSnap</h2>
+      <p>A handheld microscope that images stomata on maize leaves in the field, on the living plant, with no nail varnish impressions and no trip back to the lab. Version 4.4-R1 is the current build.</p>
+    </div>
+
+    <div class="instr">
+      <div>
+        <div class="instr-card">
+          <h3>Current build</h3>
+          <p class="data">v4.4-R1 — in qualification</p>
+          <dl class="spec">
+            <dt>Focus</dt><dd>Direct-drive micrometer spindles</dd>
+            <dt>Preload</dt><dd>Captive springs, no field adjustment</dd>
+            <dt>Clamp</dt><dd>15 seconds on the leaf, maximum</dd>
+            <dt>Optics</dt><dd>Cross-polarised episcopic green</dd>
+            <dt>Compute</dt><dd>Raspberry Pi 5, ESP32-S3</dd>
+            <dt>Storage</dt><dd>Offline-first, append-and-flush</dd>
+          </dl>
+
+          <div class="gates">
+            <p class="data" style="margin:0 0 .55rem">Qualification register — P, M, OQ and SQ series</p>
+            <div class="gate-track" id="gates" aria-hidden="true"></div>
+            <p class="data" style="margin:.6rem 0 0">52 gates in total. OQ12 is the one on the bench: closure kinetics, checking the instrument does not itself change the stomata it is measuring.</p>
+          </div>
         </div>
+      </div>
+
+      <div>
+        <h3 style="font-size:1.5rem;margin-bottom:.4rem">Why it is built this way</h3>
+        <p class="prose">Every design decision on this instrument is a subtraction. A field microscope fails on the things that are fine on a bench: a focus stage that drifts in a breeze, a preload someone has to re-set with cold hands, a clamp that stays on long enough for the leaf to react to being touched. So the spindles are direct-drive, the springs are captive, and the clamp has a hard time limit.</p>
+
+        <div class="rules">
+          <div class="rule"><b>Fifteen seconds, then release.</b><span>Maize responds to touch. Past roughly fifteen seconds the clamp is no longer observing the leaf, it is changing it — so the measurement window is enforced in firmware, not left to the operator.</span></div>
+          <div class="rule"><b>Aggregate to the plant before testing.</b><span>P-values computed over individual leaves of the same plant are pseudoreplication. Means first, statistics second.</span></div>
+          <div class="rule"><b>Vapour pressure deficit is a variable, not noise.</b><span>VPD goes into every stress model as an explicit covariate. Stomatal behaviour is not interpretable without it.</span></div>
+          <div class="rule"><b>If it cannot be re-run, it is not a result.</b><span>Explicit schema contracts, append-and-flush writes, fixed random seeds. Analysis lives in scripts that run start to finish on a clean machine.</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ AHEAD ══════════════════ -->
+<section class="band" id="ahead">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 class="sec-title">Where this is heading</h2>
+      <p>A funded PhD that keeps the instrument-building and the plant science in the same pair of hands.</p>
+    </div>
+    <div class="targets">
+      <div class="target">
+        <span class="status">Target</span>
+        <h3>PhenoRob</h3>
+        <p>Cluster of Excellence, Bonn and Göttingen. Autonomous field phenotyping — the natural home for a handheld instrument that wants to become an autonomous one.</p>
+      </div>
+      <div class="target">
+        <span class="status">Target</span>
+        <h3>Stable isotope probing at KOSI</h3>
+        <p>δ¹³C and δ¹⁵N work, tracing where carbon and nitrogen actually go once they cross into the plant.</p>
+      </div>
+      <div class="target">
+        <span class="status applied">Applied — ref. 38-2026</span>
+        <h3>ZALF, Müncheberg</h3>
+        <p>RSI/ECO position on water and nitrogen acquisition under drought, at the Leibniz Centre for Agricultural Landscape Research.</p>
+      </div>
+    </div>
+    <p class="prose" style="margin-top:1.6rem">Funded by the Deutschlandstipendium for academic merit, 2024/25.</p>
+  </div>
+</section>
+
+<!-- ══════════════════ SITES ══════════════════ -->
+<section class="band" id="sites">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 class="sec-title">Where the work happened</h2>
+      <p>Five institutions, two countries. Select a marker to filter the list.</p>
     </div>
 
-    <script>
-        const modal = document.getElementById('modal');
-        const contentArea = document.getElementById('modal-content-area');
-        const modalIdTag = document.getElementById('modal-id-tag');
+    <div class="sites">
+      <div class="map" id="map">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg" alt="World map showing field sites in Germany and Pakistan" id="mapimg">
+        <button class="pin" style="left:53.3%;top:21.1%" data-region="de" aria-pressed="false" aria-label="Show German sites"><span class="pin-label">Germany</span></button>
+        <button class="pin pk" style="left:70%;top:32.8%" data-region="pk" aria-pressed="false" aria-label="Show Pakistani sites"><span class="pin-label">Pakistan</span></button>
+      </div>
 
-        // Observer for reveal classes
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
-        }, { threshold: 0.1 });
-        document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+      <div id="sitelist">
+        <article class="site" data-region="de">
+          <h3>Göttingen &amp; Witzenhausen <em>51.5° N</em></h3>
+          <p>Joint MSc in Sustainable International Agriculture across the Universities of Göttingen and Kassel. Student research assistant on the DFG-funded MultiStress subproject SP2 under Dr Irsa Ejaz, working on hyperspectral imagery cubes, and on the TRIO One Health project.</p>
+        </article>
+        <article class="site" data-region="de">
+          <h3>Potsdam <em>52.4° N</em></h3>
+          <p>Potsdam Institute for Climate Impact Research. Took the I31 course on sustainable land use and climate mitigation, working directly with the MAgPIE global land-use model.</p>
+        </article>
+        <article class="site" data-region="de">
+          <h3>Müncheberg <em>52.5° N</em></h3>
+          <p>ZALF, the Leibniz Centre for Agricultural Landscape Research. Applied for the RSI/ECO position on crop water and nitrogen acquisition under drought, reference 38-2026.</p>
+        </article>
+        <article class="site" data-region="pk">
+          <h3>Multan <em>30.2° N</em></h3>
+          <p>Bahauddin Zakariya University. BSc (Hons) in Agriculture, Soil Science. Research assistant on HEC-NRPU project 17027 under Dr Shahid Hussain, modelling multi-element wastewater irrigation kinetics.</p>
+        </article>
+        <article class="site" data-region="pk">
+          <h3>Punjab <em>31.4° N</em></h3>
+          <p>Ministry of Agriculture. Internship at the Pesticide Quality Control Laboratory, validating regulatory compliance across 27 coded active ingredients on HPLC and uHPLC platforms.</p>
+        </article>
+      </div>
+    </div>
 
-        // Photo Grid Filter
-        function filterPhotos(category) {
-            const items = document.querySelectorAll('#photo-grid > div');
-            items.forEach(item => { item.style.display = (category === 'all' || item.dataset.category === category) ? 'block' : 'none'; });
-        }
+    <div class="langs" style="margin-top:clamp(2.5rem,6vw,4rem)">
+      <div class="lang"><b>Urdu, Saraiki, Punjabi</b><small>Native</small><div class="meter"><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i></div></div>
+      <div class="lang"><b>English</b><small>C1–C2, IELTS 7.5</small><div class="meter"><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i></div></div>
+      <div class="lang"><b>German</b><small>A2, working proficiency</small><div class="meter"><i class="f"></i><i class="f"></i><i></i><i></i><i></i></div></div>
+      <div class="lang"><b>Chinese</b><small>HSK 2, Shenyang Normal University</small><div class="meter"><i class="f"></i><i class="f"></i><i></i><i></i><i></i></div></div>
+    </div>
+  </div>
+</section>
 
-        // Content Structure tailored for high-end Glassmorphic UI
-        const modalData = {
-            'biogeochem': `
-                <div class="p-8 md:p-12 relative">
-                    <h2 class="serif text-4xl md:text-6xl text-white mb-8 border-l-4 border-emerald-500 pl-6">Rhizosphere Chemistry</h2>
-                    <div class="mb-10">
-                        <h3 class="mono text-lg text-emerald-400 mb-3 flex items-center gap-3">Spectrometry & Isotopic Tracing</h3>
-                        <div class="flex items-center gap-2 mb-4">
-                            <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-full mono text-[9px] uppercase text-zinc-300">Trace Elements</span>
-                            <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-full mono text-[9px] uppercase text-zinc-300">Kinetics</span>
-                        </div>
-                        <p class="text-base font-light leading-relaxed text-zinc-300">Advanced execution of acid digestion protocols, element calibration, and operational deployment of Atomic Absorption Spectrophotometry (AAS), Flame photometry, and UV-Vis. Expert in sample preparation for Strontium isotopic tracing (87Sr/86Sr) via ICP-OES/MS tracking.</p>
-                    </div>
-                    <div>
-                        <h3 class="mono text-lg text-emerald-400 mb-3 flex items-center gap-3">Contaminant Kinetics Modeling</h3>
-                        <div class="flex items-center gap-2 mb-4">
-                            <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-full mono text-[9px] uppercase text-zinc-300">Langmuir</span>
-                            <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-full mono text-[9px] uppercase text-zinc-300">Freundlich</span>
-                        </div>
-                        <p class="text-base font-light leading-relaxed text-zinc-300">Specialized in modeling competitive heavy metal(loid) co-contamination adsorption-desorption kinetics. Executing pseudo-second-order kinetics and non-linear equilibrium isotherms to map rhizosphere bioaccumulation.</p>
-                    </div>
-                </div>
-            `,
-            'physio': `
-                <div class="p-8 md:p-12 relative">
-                    <h2 class="serif text-4xl md:text-6xl text-white mb-8 border-l-4 border-emerald-500 pl-6">Plant Physiology</h2>
-                    <div class="mb-10">
-                        <h3 class="mono text-lg text-emerald-400 mb-3 flex items-center gap-3">Gas Exchange & Fluorescence</h3>
-                        <p class="text-base font-light leading-relaxed text-zinc-300 mt-3">Direct operational command of the LI-6800 Portable Photosynthesis System. Extracting high-resolution physiological variables to monitor sub-visual drought and frost stress pathways dynamically.</p>
-                    </div>
-                    <div>
-                        <h3 class="mono text-lg text-emerald-400 mb-3 flex items-center gap-3">Regulatory Chromatography</h3>
-                        <p class="text-base font-light leading-relaxed text-zinc-300 mt-3">Executed rigorous Quality Control (QC) operations on ultra-HPLC, HPLC, and Gas Chromatography (GC) systems for regulatory pesticide profiling, validating compliance across 27 coded active ingredients.</p>
-                    </div>
-                </div>
-            `,
-            'cv': `
-                <div class="p-8 md:p-12 relative">
-                    <h2 class="serif text-4xl md:text-6xl text-white mb-8 border-l-4 border-emerald-500 pl-6">Optical Phenotyping & CV</h2>
-                    <div class="mb-10">
-                        <h3 class="mono text-lg text-emerald-400 mb-3 flex items-center gap-3">AI-Powered Stomata Detection</h3>
-                        <p class="text-base font-light leading-relaxed text-zinc-300 mt-3">Engineered a robust machine learning pipeline for non-destructive, high-throughput phenotyping. Automated stomata detection to completely replace manual microscopy counting, reducing dataset processing times from 7 days to 1 day with a verified accuracy of >95%.</p>
-                    </div>
-                    <div>
-                        <h3 class="mono text-lg text-emerald-400 mb-3 flex items-center gap-3">Hyperspectral Imaging Arrays</h3>
-                        <p class="text-base font-light leading-relaxed text-zinc-300 mt-3">Architecture and execution of cross-polarized coaxial reflected-light (episcopic) green (520–530 nm) hyperspectral and chlorophyll fluorescence arrays to map physiological status before visual stress becomes apparent.</p>
-                    </div>
-                </div>
-            `,
-            'mechatronics': `
-                <div class="p-8 md:p-12 relative">
-                    <h2 class="serif text-4xl md:text-6xl text-white mb-8 border-l-4 border-emerald-500 pl-6">Edge Computing & Mechatronics</h2>
-                    <div class="mb-10">
-                        <h3 class="mono text-lg text-emerald-400 mb-3 flex items-center gap-3">StomaSnap v4.4-R1 Architecture</h3>
-                        <div class="flex items-center gap-2 mb-4">
-                            <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-full mono text-[9px] uppercase text-zinc-300">Master Handbook Author</span>
-                        </div>
-                        <p class="text-base font-light leading-relaxed text-zinc-300">De-risked system complexity by enforcing direct-drive micrometer spindles, captive spring preloads, and a strict 15-second thigmonastic clamp constraint. Currently executing the 52-gate qualification register (P, M, OQ, SQ series).</p>
-                    </div>
-                    <div>
-                        <h3 class="mono text-lg text-emerald-400 mb-3 flex items-center gap-3">Heterogeneous Sensor Networks</h3>
-                        <p class="text-base font-light leading-relaxed text-zinc-300 mt-3">Systems design spanning Raspberry Pi 5 (8GB), ESP32-S3 WROOM, and RP2040-Zero. Integrated with high-precision digital/analog sensor networks over hardware I2C/SPI interfaces, resolving address collisions with TCA9548A multiplexers and 16-bit ADCs, all governed by an offline-first data structure.</p>
-                    </div>
-                </div>
-            `,
-            'geo': `
-                <div class="p-8 md:p-12 relative">
-                    <h2 class="serif text-4xl md:text-6xl text-white mb-8 border-l-4 border-emerald-500 pl-6">Geospatial Analytics</h2>
-                    <div class="mb-10">
-                        <h3 class="mono text-lg text-emerald-400 mb-3 flex items-center gap-3">Programmatic Data Cubes</h3>
-                        <p class="text-base font-light leading-relaxed text-zinc-300 mt-3">Actively transitioning spatial analysis from GUI-based software (ArcGIS Pro) into programmatic workflows executing highly optimized spatial data cubes via Python libraries (geopandas, rasterio, xarray, shapely).</p>
-                    </div>
-                    <div>
-                        <h3 class="mono text-lg text-emerald-400 mb-3 flex items-center gap-3">Interpolation & UAV Flight Planning</h3>
-                        <p class="text-base font-light leading-relaxed text-zinc-300 mt-3">Command of UAV drone flight planning and multi-spectral vegetation index extraction (NDVI, NDRE). Applied regional and city-scale spatial interpolation utilizing IDW and Kriging interpolation models.</p>
-                    </div>
-                </div>
-            `,
-            'lead': `
-                <div class="p-8 md:p-12 relative">
-                    <h2 class="serif text-4xl md:text-6xl text-white mb-8 border-l-4 border-emerald-500 pl-6">Strategic Roadmaps</h2>
-                    <div class="mb-10">
-                        <h3 class="mono text-lg text-emerald-400 mb-3 flex items-center gap-3">PhD Target Vectors</h3>
-                        <div class="flex items-center gap-2 mb-4">
-                            <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-full mono text-[9px] uppercase text-zinc-300">Elite German Clusters</span>
-                        </div>
-                        <p class="text-base font-light leading-relaxed text-zinc-300">Actively positioning for a funded PhD inside the PhenoRob Cluster of Excellence (Bonn/Göttingen) focusing on autonomous field phenotyping, targeting stable isotope probing (δ13C/δ15N) at KOSI, and pursuing the ZALF RSI/ECO investigation into crop resource acquisition (Ref. 38-2026).</p>
-                    </div>
-                    <div>
-                        <h3 class="mono text-lg text-emerald-400 mb-3 flex items-center gap-3">Institutional Excellence</h3>
-                        <p class="text-base font-light leading-relaxed text-zinc-300 mt-3">Joint M.Sc. Candidate in Sustainable International Agriculture. Recipient of the prestigious Deutschlandstipendium (German National Scholarship) 2024/25 for high academic merit.</p>
-                    </div>
-                </div>
-            `
-        };
+<!-- ══════════════════ LENS ══════════════════ -->
+<section class="band" id="lens">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 class="sec-title">@weedslens</h2>
+      <p>The other half of looking closely at things. Select a frame to enlarge it.</p>
+    </div>
 
-        function openModal(id) {
-            contentArea.innerHTML = modalData[id];
-            modalIdTag.textContent = `[ ${id.toUpperCase()} ]`;
-            modal.classList.remove('hidden');
-            setTimeout(() => modal.classList.remove('opacity-0'), 10);
-            document.body.style.overflow = 'hidden'; 
-        }
+    <div class="filters" role="group" aria-label="Filter photographs">
+      <button class="filter" data-filter="all" aria-pressed="true">Everything</button>
+      <button class="filter" data-filter="landscape" aria-pressed="false">Landscape</button>
+      <button class="filter" data-filter="portraits" aria-pressed="false">Portraits</button>
+      <button class="filter" data-filter="animals" aria-pressed="false">Animals</button>
+    </div>
 
-        function openLocation(title, desc) {
-            contentArea.innerHTML = `
-                <div class="p-8 md:p-12">
-                    <h2 class="serif text-4xl md:text-5xl text-white mb-6 border-l-4 border-emerald-400 pl-6">${title}</h2>
-                    <div class="mt-6 text-base font-light leading-relaxed text-zinc-300">${desc}</div>
-                </div>
-            `;
-            modalIdTag.textContent = `[ GEO_NODE ]`;
-            modal.classList.remove('hidden');
-            setTimeout(() => modal.classList.remove('opacity-0'), 10);
-            document.body.style.overflow = 'hidden';
-        }
+    <div class="sheet" id="sheet">
+      <button class="shot" data-category="landscape"><img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&amp;w=800" alt="Lake and mountains at dusk" loading="lazy"><figcaption>Landscape</figcaption></button>
+      <button class="shot" data-category="portraits"><img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&amp;w=800" alt="Portrait in daylight" loading="lazy"><figcaption>Portrait</figcaption></button>
+      <button class="shot" data-category="animals"><img src="https://images.unsplash.com/photo-1474511320723-9a56873867b5?q=80&amp;w=800" alt="Fox in undergrowth" loading="lazy"><figcaption>Animal</figcaption></button>
+      <button class="shot" data-category="landscape"><img src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?q=80&amp;w=800" alt="Coastline under cloud" loading="lazy"><figcaption>Landscape</figcaption></button>
+      <button class="shot" data-category="landscape"><img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&amp;w=800" alt="Sunlight through a forest" loading="lazy"><figcaption>Landscape</figcaption></button>
+      <button class="shot" data-category="animals"><img src="https://images.unsplash.com/photo-1518791841217-8f162f1e1131?q=80&amp;w=800" alt="Cat looking up" loading="lazy"><figcaption>Animal</figcaption></button>
+      <button class="shot" data-category="portraits"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&amp;w=800" alt="Portrait against a plain wall" loading="lazy"><figcaption>Portrait</figcaption></button>
+      <button class="shot" data-category="animals"><img src="https://images.unsplash.com/photo-1552053831-71594a27632d?q=80&amp;w=800" alt="Dog in long grass" loading="lazy"><figcaption>Animal</figcaption></button>
+    </div>
+    <p class="empty" id="empty" hidden>No frames in this category yet. Choose another, or go back to everything.</p>
+  </div>
+</section>
 
-        function closeModal() {
-            modal.classList.add('opacity-0');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                contentArea.innerHTML = '';
-                document.body.style.overflow = '';
-            }, 300); 
-        }
+<!-- ══════════════════ CONTACT ══════════════════ -->
+<footer class="band foot" id="contact">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <h2 class="sec-title" style="margin-bottom:1rem">Get in touch</h2>
+        <p class="prose" style="margin-bottom:1.6rem">Open to PhD positions, collaborations on field phenotyping, and anyone building instruments that have to survive a real field season.</p>
+        <div class="links">
+          <a class="link" href="https://linkedin.com/in/waleedramzan" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+            LinkedIn
+          </a>
+          <a class="link" href="https://scholar.google.com/citations?user=Jm5Vp_oAAAAJ&amp;hl=en" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 24a7 7 0 1 1 0-14 7 7 0 0 1 0 14zm0-24L0 9.5l4.838 2.735c-.078.435-.152.888-.152 1.411 0 2.923 2.196 5.568 5.615 6.784l-.841 1.543c-1.391-.122-2.827-.585-4.045-1.428l-1.071 1.706C5.975 23.363 8.761 24 12 24s6.025-.637 7.656-1.749l-1.071-1.706c-1.218.843-2.654 1.306-4.045 1.428l-.841-1.543c3.419-1.216 5.615-3.861 5.615-6.784 0-.523-.074-.976-.152-1.411L24 9.5 12 0z"/></svg>
+            Google Scholar
+          </a>
+          <a class="link" href="https://www.instagram.com/thesoilkid" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073z"/></svg>
+            Instagram
+          </a>
+          <!-- Add your email here: <a class="link" href="mailto:you@example.com">Email</a> -->
+        </div>
+      </div>
+      <p class="colophon">
+        Göttingen, Lower Saxony<br>
+        Fraunces &amp; IBM Plex<br>
+        Last revised September 2026
+      </p>
+    </div>
+  </div>
+</footer>
+</main>
 
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeModal();
-        });
+<!-- lightbox -->
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Enlarged photograph">
+  <button class="lb-close" id="lbClose" aria-label="Close">&times;</button>
+  <button class="lb-nav lb-prev" id="lbPrev" aria-label="Previous photograph">&#8249;</button>
+  <button class="lb-nav lb-next" id="lbNext" aria-label="Next photograph">&#8250;</button>
+  <figure>
+    <img id="lbImg" src="" alt="">
+    <figcaption><span id="lbCap"></span><span id="lbCount" class="tnum"></span></figcaption>
+  </figure>
+</div>
 
-        // ----------------------------------------------------
-        // THE BIOLUMINESCENT CANOPY (Interactive Canvas)
-        // ----------------------------------------------------
-        const canvas = document.getElementById('network-canvas');
-        const ctx = canvas.getContext('2d');
-        
-        let width, height;
-        let particles = [];
-        const isMobile = window.innerWidth < 768;
-        const PARTICLE_COUNT = isMobile ? 35 : 75; 
-        const MAX_DIST = isMobile ? 120 : 180;
-        
-        let mouse = { x: null, y: null };
-        
-        function resize() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-        }
-        
-        class Particle {
-            constructor() {
-                this.x = Math.random() * width;
-                this.y = Math.random() * height;
-                this.vx = (Math.random() - 0.5) * 0.3;
-                this.vy = (Math.random() - 0.8) * 0.5; // Upward bias for Soil-to-Canopy flow
-                this.radius = Math.random() * 2 + 0.5;
-                // Mix of Emerald and Cyan
-                this.color = Math.random() > 0.5 ? '16, 185, 129' : '14, 165, 233'; 
-            }
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
-                if (this.x < 0 || this.x > width) this.vx *= -1;
-                if (this.y < 0) this.y = height; // Wrap to bottom
-                if (this.y > height) this.y = 0; // Wrap to top
-            }
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(${this.color}, 0.6)`;
-                ctx.fill();
-                // Glow effect
-                ctx.shadowBlur = 10;
-                ctx.shadowColor = `rgba(${this.color}, 0.8)`;
-            }
-        }
-        
-        function initNetwork() {
-            particles = [];
-            for (let i = 0; i < PARTICLE_COUNT; i++) {
-                particles.push(new Particle());
-            }
-        }
-        
-        function animate() {
-            ctx.clearRect(0, 0, width, height);
-            
-            for (let i = 0; i < particles.length; i++) {
-                particles[i].update();
-                particles[i].draw();
-                ctx.shadowBlur = 0; // reset for lines
-                
-                for (let j = i; j < particles.length; j++) {
-                    const dx = particles[i].x - particles[j].x;
-                    const dy = particles[i].y - particles[j].y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    
-                    if (dist < MAX_DIST) {
-                        ctx.beginPath();
-                        ctx.strokeStyle = `rgba(16, 185, 129, ${(1 - dist/MAX_DIST) * 0.15})`;
-                        ctx.lineWidth = 0.8;
-                        ctx.moveTo(particles[i].x, particles[i].y);
-                        ctx.lineTo(particles[j].x, particles[j].y);
-                        ctx.stroke();
-                    }
-                }
-                
-                if (mouse.x != null && mouse.y != null) {
-                    const dxm = particles[i].x - mouse.x;
-                    const dym = particles[i].y - mouse.y;
-                    const distm = Math.sqrt(dxm * dxm + dym * dym);
-                    if (distm < MAX_DIST * 1.2) {
-                        ctx.beginPath();
-                        ctx.strokeStyle = `rgba(14, 165, 233, ${(1 - distm/(MAX_DIST*1.2)) * 0.3})`;
-                        ctx.lineWidth = 1;
-                        ctx.moveTo(particles[i].x, particles[i].y);
-                        ctx.lineTo(mouse.x, mouse.y);
-                        ctx.stroke();
-                    }
-                }
-            }
-            requestAnimationFrame(animate);
-        }
-        
-        let resizeTimer;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(() => { resize(); initNetwork(); }, 250);
-        });
+<script>
+(function(){
+  "use strict";
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-        document.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; }, { passive: true });
-        document.getElementById('main-scroll').addEventListener('scroll', () => {
-            if(isMobile) { mouse.x = width/2; mouse.y = height/2; }
-        }, { passive: true });
-        document.addEventListener('mouseleave', () => { mouse.x = null; mouse.y = null; });
-        
-        resize();
-        initNetwork();
-        animate();
-    </script>
+  /* ---- scroll progress ---- */
+  var bar = document.getElementById('progress'), ticking = false;
+  function progress(){
+    var h = document.documentElement.scrollHeight - window.innerHeight;
+    bar.style.transform = 'scaleX(' + (h > 0 ? window.scrollY / h : 0) + ')';
+    ticking = false;
+  }
+  addEventListener('scroll', function(){ if(!ticking){ ticking = true; requestAnimationFrame(progress); } }, {passive:true});
+  progress();
+
+  /* ---- active section in nav + rail ---- */
+  var marks = [].slice.call(document.querySelectorAll('#nav a, #rail a'));
+  var targets = [].slice.call(document.querySelectorAll('main section, main footer'));
+  var spy = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(!e.isIntersecting) return;
+      var id = '#' + e.target.id;
+      marks.forEach(function(a){ a.classList.toggle('on', a.getAttribute('href') === id); });
+    });
+  }, {rootMargin:'-45% 0px -50% 0px'});
+  targets.forEach(function(t){ spy.observe(t); });
+
+  /* ---- expandable method rows ---- */
+  document.querySelectorAll('.row-head').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      btn.setAttribute('aria-expanded', btn.getAttribute('aria-expanded') === 'true' ? 'false' : 'true');
+    });
+  });
+
+  /* ---- qualification gates ---- */
+  var track = document.getElementById('gates');
+  if(track){
+    var frag = document.createDocumentFragment();
+    for(var i = 1; i <= 52; i++){
+      var g = document.createElement('span');
+      g.className = 'gate' + (i === 26 ? ' now' : '');
+      frag.appendChild(g);
+    }
+    track.appendChild(frag);
+  }
+
+  /* ---- site pins ---- */
+  var pins = [].slice.call(document.querySelectorAll('.pin'));
+  var siteEls = [].slice.call(document.querySelectorAll('.site'));
+  pins.forEach(function(pin){
+    pin.addEventListener('click', function(){
+      var active = pin.getAttribute('aria-pressed') === 'true';
+      pins.forEach(function(p){ p.setAttribute('aria-pressed','false'); });
+      if(!active) pin.setAttribute('aria-pressed','true');
+      var region = active ? null : pin.dataset.region;
+      siteEls.forEach(function(s){ s.classList.toggle('dim', !!region && s.dataset.region !== region); });
+    });
+  });
+  var mapimg = document.getElementById('mapimg');
+  if(mapimg) mapimg.addEventListener('error', function(){ document.getElementById('map').style.display = 'none'; });
+
+  /* ---- photograph filters ---- */
+  var shots = [].slice.call(document.querySelectorAll('.shot'));
+  var empty = document.getElementById('empty');
+  document.querySelectorAll('.filter').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.filter').forEach(function(b){ b.setAttribute('aria-pressed','false'); });
+      btn.setAttribute('aria-pressed','true');
+      var f = btn.dataset.filter, shown = 0;
+      shots.forEach(function(s){
+        var show = (f === 'all' || s.dataset.category === f);
+        s.classList.toggle('hide', !show);
+        if(show) shown++;
+      });
+      empty.hidden = shown > 0;
+    });
+  });
+  shots.forEach(function(s){
+    var img = s.querySelector('img');
+    img.addEventListener('error', function(){ s.classList.add('broken'); });
+  });
+
+  /* ---- lightbox ---- */
+  var lb = document.getElementById('lb'), lbImg = document.getElementById('lbImg'),
+      lbCap = document.getElementById('lbCap'), lbCount = document.getElementById('lbCount'),
+      last = null, idx = 0;
+  function visible(){ return shots.filter(function(s){ return !s.classList.contains('hide') && !s.classList.contains('broken'); }); }
+  function show(n){
+    var list = visible();
+    if(!list.length) return;
+    idx = (n + list.length) % list.length;
+    var img = list[idx].querySelector('img');
+    lbImg.src = img.src; lbImg.alt = img.alt;
+    lbCap.textContent = list[idx].querySelector('figcaption').textContent;
+    lbCount.textContent = (idx + 1) + ' / ' + list.length;
+  }
+  function open(n){ last = document.activeElement; show(n); lb.classList.add('open'); document.body.style.overflow = 'hidden'; document.getElementById('lbClose').focus(); }
+  function close(){ lb.classList.remove('open'); document.body.style.overflow = ''; lbImg.src = ''; if(last) last.focus(); }
+  shots.forEach(function(s){ s.addEventListener('click', function(){ open(visible().indexOf(s)); }); });
+  document.getElementById('lbClose').addEventListener('click', close);
+  document.getElementById('lbPrev').addEventListener('click', function(){ show(idx - 1); });
+  document.getElementById('lbNext').addEventListener('click', function(){ show(idx + 1); });
+  lb.addEventListener('click', function(e){ if(e.target === lb) close(); });
+  document.addEventListener('keydown', function(e){
+    if(!lb.classList.contains('open')) return;
+    if(e.key === 'Escape') close();
+    if(e.key === 'ArrowLeft') show(idx - 1);
+    if(e.key === 'ArrowRight') show(idx + 1);
+  });
+})();
+</script>
+
 </body>
 </html>
