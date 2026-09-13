@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Waleed Ramzan — soil, leaf and canopy measurement</title>
-<meta name="description" content="Waleed Ramzan (TheSoilKid) — MSc researcher measuring crop stress from the rhizosphere to the canopy, and building the field instruments that do the measuring.">
+<meta name="description" content="Waleed Ramzan (TheSoilKid) — MSc researcher measuring crop stress from the rhizosphere to the canopy.">
 <meta name="theme-color" content="#0B0A09">
 
 <meta property="og:title" content="Waleed Ramzan — soil, leaf and canopy measurement">
-<meta property="og:description" content="Rhizosphere chemistry, leaf-level phenotyping, UAV survey, and the StomaSnap handheld field microscope.">
+<meta property="og:description" content="Rhizosphere chemistry, leaf-level phenotyping, UAV survey, and machine-learning stomata detection.">
 <meta property="og:type" content="profile">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -186,22 +186,25 @@ h1,h2,h3{font-family:var(--serif);font-weight:300;margin:0;font-variation-settin
   .row-inner{padding-left:.25rem}
 }
 
-/* ---------- instrument feature ---------- */
-.instr{display:grid;gap:clamp(1.5rem,4vw,3rem);grid-template-columns:1fr}
-@media (min-width:900px){.instr{grid-template-columns:minmax(260px,.8fr) minmax(0,1.2fr)}}
-.instr-card{border:1px solid var(--line);background:var(--panel);padding:1.4rem}
-.instr-card h3{font-size:1.15rem;margin-bottom:.5rem}
-.spec{display:grid;grid-template-columns:auto 1fr;gap:.5rem 1.1rem;font-size:.85rem;margin-top:1.2rem}
-.spec dt{font-family:var(--mono);font-size:.7rem;color:var(--muted);padding-top:.15rem}
-.spec dd{margin:0}
-.gates{margin-top:1.4rem}
-.gate-track{display:flex;gap:3px;flex-wrap:wrap}
-.gate{width:9px;height:16px;background:var(--line);border-radius:1px}
-.gate.now{background:var(--clay)}
-.rules{display:grid;gap:0;margin-top:1rem;border-top:1px solid var(--line)}
+/* ---------- selected work ---------- */
+.recs{border-top:1px solid var(--line)}
+.rec{display:grid;gap:.5rem 2.4rem;padding:1.5rem 0;border-bottom:1px solid var(--line-soft)}
+@media (min-width:860px){.rec{grid-template-columns:230px minmax(0,1fr)}}
+.rec-org{font-family:var(--mono);font-size:.69rem;line-height:1.7;color:var(--muted)}
+.rec h3{font-size:1.22rem;font-variation-settings:"opsz" 36,"SOFT" 18}
+.rec p{margin:.35rem 0 0;color:var(--muted);font-size:.95rem;max-width:62ch}
+.rec-out{display:inline-block;margin-top:.75rem;font-family:var(--mono);font-size:.66rem;color:var(--leaf);border:1px solid rgba(155,197,61,.3);background:var(--leaf-soft);padding:.2rem .55rem}
+.rules{display:grid;gap:0;margin-top:1.2rem;border-top:1px solid var(--line)}
 .rule{padding:1.15rem 0;border-bottom:1px solid var(--line-soft);display:grid;gap:.35rem}
 .rule b{font-family:var(--serif);font-weight:400;font-size:1.12rem;font-variation-settings:"opsz" 36}
 .rule span{color:var(--muted);font-size:.95rem}
+
+/* ---------- latitude chart ---------- */
+.latfig{margin:0}
+.latfig svg{width:100%;height:auto;border:1px solid var(--line);background:var(--panel);padding:.5rem}
+.latfig figcaption{margin-top:.7rem;max-width:46ch}
+.lat-dot{transition:r .3s var(--ease),fill .3s}
+.lat-dot.hot{fill:var(--text)}
 
 /* ---------- ahead / targets ---------- */
 .targets{display:grid;gap:1px;background:var(--line);border:1px solid var(--line)}
@@ -215,18 +218,13 @@ h1,h2,h3{font-family:var(--serif);font-weight:300;margin:0;font-variation-settin
 /* ---------- sites ---------- */
 .sites{display:grid;gap:clamp(1.5rem,4vw,2.6rem)}
 @media (min-width:900px){.sites{grid-template-columns:minmax(0,1.25fr) minmax(280px,.75fr)}}
-.map{position:relative;border:1px solid var(--line);background:var(--panel);padding:.75rem}
-.map img{width:100%;opacity:.22;filter:sepia(1) hue-rotate(45deg) saturate(.6) brightness(.9)}
-.pin{position:absolute;width:13px;height:13px;transform:translate(-50%,-50%);border-radius:50%;background:var(--leaf);box-shadow:0 0 0 4px rgba(155,197,61,.18);transition:transform .3s var(--ease)}
-.pin.pk{background:var(--clay);box-shadow:0 0 0 4px rgba(201,129,78,.18)}
-.pin:hover,.pin[aria-pressed="true"]{transform:translate(-50%,-50%) scale(1.35)}
-.pin-label{position:absolute;top:16px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:.6rem;color:var(--text);white-space:nowrap;background:var(--ink);border:1px solid var(--line);padding:.15rem .4rem;pointer-events:none}
 .site{border-bottom:1px solid var(--line-soft);padding:1.1rem 0;transition:opacity .35s}
 .site:first-child{border-top:1px solid var(--line)}
 .site h3{font-size:1.1rem;display:flex;align-items:baseline;gap:.6rem}
 .site h3 em{font-style:normal;font-family:var(--mono);font-size:.62rem;color:var(--muted);margin-left:auto}
 .site p{margin:.35rem 0 0;color:var(--muted);font-size:.9rem}
-.site.dim{opacity:.28}
+.site{outline-offset:6px}
+.site.hot h3{color:var(--leaf)}
 
 /* ---------- languages ---------- */
 .langs{display:grid;gap:1px;background:var(--line);border:1px solid var(--line)}
@@ -285,7 +283,7 @@ h1,h2,h3{font-family:var(--serif);font-weight:300;margin:0;font-variation-settin
   <div class="brand"><i></i><b>Waleed Ramzan</b><span>TheSoilKid</span></div>
   <nav class="navlinks" id="nav">
     <a href="#work">What I measure</a>
-    <a href="#instrument">StomaSnap</a>
+    <a href="#record">Selected work</a>
     <a href="#ahead">Where it's heading</a>
     <a href="#sites">Sites</a>
     <a href="#lens">Photographs</a>
@@ -296,7 +294,7 @@ h1,h2,h3{font-family:var(--serif);font-weight:300;margin:0;font-variation-settin
 <nav class="rail" id="rail" aria-label="Section marker">
   <a href="#top"><i></i><span>Top</span></a>
   <a href="#work"><i></i><span>Measurement</span></a>
-  <a href="#instrument"><i></i><span>Instrument</span></a>
+  <a href="#record"><i></i><span>Selected work</span></a>
   <a href="#ahead"><i></i><span>Heading</span></a>
   <a href="#sites"><i></i><span>Sites</span></a>
   <a href="#lens"><i></i><span>Photographs</span></a>
@@ -320,7 +318,7 @@ h1,h2,h3{font-family:var(--serif);font-weight:300;margin:0;font-variation-settin
         <div class="figures">
           <div class="fig"><b class="tnum">&gt;95%</b><span>Accuracy of the stomata detector against manual counts</span></div>
           <div class="fig"><b class="tnum">7 → 1</b><span>Days to process one imaging dataset, after automation</span></div>
-          <div class="fig"><b class="tnum">52</b><span>Qualification gates on the current instrument build</span></div>
+          <div class="fig"><b class="tnum">27</b><span>Coded active ingredients checked in regulatory QC</span></div>
         </div>
       </div>
 
@@ -576,47 +574,82 @@ h1,h2,h3{font-family:var(--serif);font-weight:300;margin:0;font-variation-settin
   </div>
 </section>
 
-<!-- ══════════════════ INSTRUMENT ══════════════════ -->
-<section class="band" id="instrument">
+<!-- ══════════════════ SELECTED WORK ══════════════════ -->
+<section class="band" id="record">
   <div class="wrap">
     <div class="sec-head">
-      <h2 class="sec-title">StomaSnap</h2>
-      <p>A handheld microscope that images stomata on maize leaves in the field, on the living plant, with no nail varnish impressions and no trip back to the lab. Version 4.4-R1 is the current build.</p>
+      <h2 class="sec-title">Selected work</h2>
+      <p>Projects I was actually hands-on with, and what came out of each one.</p>
     </div>
 
-    <div class="instr">
-      <div>
-        <div class="instr-card">
-          <h3>Current build</h3>
-          <p class="data">v4.4-R1 — in qualification</p>
-          <dl class="spec">
-            <dt>Focus</dt><dd>Direct-drive micrometer spindles</dd>
-            <dt>Preload</dt><dd>Captive springs, no field adjustment</dd>
-            <dt>Clamp</dt><dd>15 seconds on the leaf, maximum</dd>
-            <dt>Optics</dt><dd>Cross-polarised episcopic green</dd>
-            <dt>Compute</dt><dd>Raspberry Pi 5, ESP32-S3</dd>
-            <dt>Storage</dt><dd>Offline-first, append-and-flush</dd>
-          </dl>
-
-          <div class="gates">
-            <p class="data" style="margin:0 0 .55rem">Qualification register — P, M, OQ and SQ series</p>
-            <div class="gate-track" id="gates" aria-hidden="true"></div>
-            <p class="data" style="margin:.6rem 0 0">52 gates in total. OQ12 is the one on the bench: closure kinetics, checking the instrument does not itself change the stomata it is measuring.</p>
-          </div>
+    <div class="recs">
+      <article class="rec">
+        <div class="rec-org">Göttingen<br>Machine learning pipeline</div>
+        <div>
+          <h3>Automated stomata detection</h3>
+          <p>Built a detection pipeline that counts and measures stomata in microscope imagery without a person at the eyepiece, then validated it against manual counts. It made high-throughput sampling realistic for a single researcher rather than a team.</p>
+          <span class="rec-out">&gt;95% agreement — 7 days to 1 day per dataset</span>
         </div>
-      </div>
+      </article>
 
-      <div>
-        <h3 style="font-size:1.5rem;margin-bottom:.4rem">Why it is built this way</h3>
-        <p class="prose">Every design decision on this instrument is a subtraction. A field microscope fails on the things that are fine on a bench: a focus stage that drifts in a breeze, a preload someone has to re-set with cold hands, a clamp that stays on long enough for the leaf to react to being touched. So the spindles are direct-drive, the springs are captive, and the clamp has a hard time limit.</p>
-
-        <div class="rules">
-          <div class="rule"><b>Fifteen seconds, then release.</b><span>Maize responds to touch. Past roughly fifteen seconds the clamp is no longer observing the leaf, it is changing it — so the measurement window is enforced in firmware, not left to the operator.</span></div>
-          <div class="rule"><b>Aggregate to the plant before testing.</b><span>P-values computed over individual leaves of the same plant are pseudoreplication. Means first, statistics second.</span></div>
-          <div class="rule"><b>Vapour pressure deficit is a variable, not noise.</b><span>VPD goes into every stress model as an explicit covariate. Stomatal behaviour is not interpretable without it.</span></div>
-          <div class="rule"><b>If it cannot be re-run, it is not a result.</b><span>Explicit schema contracts, append-and-flush writes, fixed random seeds. Analysis lives in scripts that run start to finish on a clean machine.</span></div>
+      <article class="rec">
+        <div class="rec-org">University of Göttingen<br>Student research assistant</div>
+        <div>
+          <h3>MultiStress SP2, DFG-funded</h3>
+          <p>Hyperspectral imagery cubes for the MultiStress subproject under Dr Irsa Ejaz — handling, cleaning and interpreting reflectance data from plants carrying more than one stress at a time.</p>
+          <span class="rec-out">Hyperspectral cube processing</span>
         </div>
-      </div>
+      </article>
+
+      <article class="rec">
+        <div class="rec-org">University of Kassel<br>Student research assistant</div>
+        <div>
+          <h3>TRIO One Health</h3>
+          <p>Research assistance on a project sitting at the join between crop, animal and human health, where the agronomy has to be legible to people who are not agronomists.</p>
+        </div>
+      </article>
+
+      <article class="rec">
+        <div class="rec-org">Bahauddin Zakariya University, Multan<br>Research assistant</div>
+        <div>
+          <h3>Wastewater irrigation kinetics — HEC-NRPU 17027</h3>
+          <p>Batch sorption work under Dr Shahid Hussain on soils carrying several contaminants at once, fitted with pseudo-second-order kinetics and non-linear Langmuir and Freundlich isotherms.</p>
+          <span class="rec-out">Competitive multi-element sorption modelling</span>
+        </div>
+      </article>
+
+      <article class="rec">
+        <div class="rec-org">Ministry of Agriculture, Punjab<br>Laboratory intern</div>
+        <div>
+          <h3>Pesticide quality control</h3>
+          <p>Regulatory chromatography at the Pesticide Quality Control Laboratory — uHPLC, HPLC and GC runs checking whether products on the market match what their label claims.</p>
+          <span class="rec-out">27 coded active ingredients</span>
+        </div>
+      </article>
+
+      <article class="rec">
+        <div class="rec-org">Potsdam Institute for Climate Impact Research<br>Course I31</div>
+        <div>
+          <h3>Land use and climate mitigation modelling</h3>
+          <p>Worked with the MAgPIE global land-use model alongside the researchers who build it — the scale at which a plot-level measurement finally becomes a policy argument.</p>
+        </div>
+      </article>
+
+      <article class="rec">
+        <div class="rec-org">German National Scholarship<br>2024/25</div>
+        <div>
+          <h3>Deutschlandstipendium</h3>
+          <p>Awarded on academic merit alongside the joint MSc in Sustainable International Agriculture, following a BSc (Hons) in Soil Science.</p>
+        </div>
+      </article>
+    </div>
+
+    <h3 style="font-size:1.5rem;margin:clamp(2.5rem,6vw,4rem) 0 .4rem">How I work</h3>
+    <p class="prose">Three habits that decide whether a season of fieldwork turns into a defensible result.</p>
+    <div class="rules">
+      <div class="rule"><b>Aggregate to the plant before testing.</b><span>P-values computed over individual leaves of the same plant are pseudoreplication. Means first, statistics second.</span></div>
+      <div class="rule"><b>Vapour pressure deficit is a variable, not noise.</b><span>VPD goes into every stress model as an explicit covariate. Stomatal behaviour is not interpretable without it.</span></div>
+      <div class="rule"><b>If it cannot be re-run, it is not a result.</b><span>Explicit schema contracts, append-and-flush writes, fixed random seeds. Analysis lives in scripts that run start to finish on a clean machine.</span></div>
     </div>
   </div>
 </section>
@@ -632,7 +665,7 @@ h1,h2,h3{font-family:var(--serif);font-weight:300;margin:0;font-variation-settin
       <div class="target">
         <span class="status">Target</span>
         <h3>PhenoRob</h3>
-        <p>Cluster of Excellence, Bonn and Göttingen. Autonomous field phenotyping — the natural home for a handheld instrument that wants to become an autonomous one.</p>
+        <p>Cluster of Excellence, Bonn and Göttingen. Autonomous field phenotyping, where sensing hardware and plant science are treated as one problem rather than two.</p>
       </div>
       <div class="target">
         <span class="status">Target</span>
@@ -654,34 +687,80 @@ h1,h2,h3{font-family:var(--serif);font-weight:300;margin:0;font-variation-settin
   <div class="wrap">
     <div class="sec-head">
       <h2 class="sec-title">Where the work happened</h2>
-      <p>Five institutions, two countries. Select a marker to filter the list.</p>
+      <p>Five institutions, two countries.</p>
     </div>
 
     <div class="sites">
-      <div class="map" id="map">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg" alt="World map showing field sites in Germany and Pakistan" id="mapimg">
-        <button class="pin" style="left:53.3%;top:21.1%" data-region="de" aria-pressed="false" aria-label="Show German sites"><span class="pin-label">Germany</span></button>
-        <button class="pin pk" style="left:70%;top:32.8%" data-region="pk" aria-pressed="false" aria-label="Show Pakistani sites"><span class="pin-label">Pakistan</span></button>
-      </div>
+      <figure class="latfig">
+        <svg viewBox="0 0 460 470" role="img" aria-label="Field sites plotted by latitude, from 30 to 53 degrees north">
+          <g font-family="IBM Plex Mono, monospace" font-size="10" fill="#9C9084">
+            <line x1="96" y1="34" x2="96" y2="426" stroke="#2E241B" stroke-width="1.5"/>
+            <g stroke="#2E241B" stroke-width="1.5">
+              <line x1="88" y1="40" x2="104" y2="40"/><line x1="88" y1="135" x2="104" y2="135"/>
+              <line x1="88" y1="230" x2="104" y2="230"/><line x1="88" y1="325" x2="104" y2="325"/>
+              <line x1="88" y1="420" x2="104" y2="420"/>
+            </g>
+            <text x="80" y="44" text-anchor="end">60°N</text>
+            <text x="80" y="139" text-anchor="end">50°N</text>
+            <text x="80" y="234" text-anchor="end">40°N</text>
+            <text x="80" y="329" text-anchor="end">30°N</text>
+            <text x="80" y="424" text-anchor="end">20°N</text>
+          </g>
+
+          <rect x="92" y="106" width="8" height="20" fill="#9BC53D" opacity=".2"/>
+          <rect x="92" y="306" width="8" height="22" fill="#C9814E" opacity=".2"/>
+
+          <g fill="none" stroke="#2E241B" stroke-width="1">
+            <path d="M96,111 L128,96 L150,96"/>
+            <path d="M96,112 L128,124 L150,124"/>
+            <path d="M96,121 L128,152 L150,152"/>
+            <path d="M96,312 L128,300 L150,300"/>
+            <path d="M96,323 L128,330 L150,330"/>
+          </g>
+
+          <g>
+            <circle class="lat-dot" id="m-mu" cx="96" cy="111" r="5" fill="#9BC53D"/>
+            <circle class="lat-dot" id="m-po" cx="96" cy="112" r="5" fill="#9BC53D"/>
+            <circle class="lat-dot" id="m-go" cx="96" cy="121" r="6" fill="#9BC53D"/>
+            <circle class="lat-dot" id="m-pu" cx="96" cy="312" r="5" fill="#C9814E"/>
+            <circle class="lat-dot" id="m-ml" cx="96" cy="323" r="6" fill="#C9814E"/>
+          </g>
+
+          <g font-family="IBM Plex Sans, sans-serif" font-size="13" fill="#F0E9DD">
+            <text x="158" y="100">Müncheberg <tspan font-family="IBM Plex Mono, monospace" font-size="9.5" fill="#9C9084">52.5°</tspan></text>
+            <text x="158" y="128">Potsdam <tspan font-family="IBM Plex Mono, monospace" font-size="9.5" fill="#9C9084">52.4°</tspan></text>
+            <text x="158" y="156">Göttingen &amp; Witzenhausen <tspan font-family="IBM Plex Mono, monospace" font-size="9.5" fill="#9C9084">51.5°</tspan></text>
+            <text x="158" y="304">Punjab <tspan font-family="IBM Plex Mono, monospace" font-size="9.5" fill="#9C9084">31.4°</tspan></text>
+            <text x="158" y="334">Multan <tspan font-family="IBM Plex Mono, monospace" font-size="9.5" fill="#9C9084">30.2°</tspan></text>
+          </g>
+
+          <g font-family="IBM Plex Mono, monospace" font-size="9.5" fill="#9C9084">
+            <text x="158" y="84">Germany</text>
+            <text x="158" y="288">Pakistan</text>
+            <text x="96" y="452" text-anchor="middle">latitude</text>
+          </g>
+        </svg>
+        <figcaption class="data">Twenty-two degrees of latitude between the two halves of the work — roughly the difference between a maize season that is limited by heat and one that is limited by light.</figcaption>
+      </figure>
 
       <div id="sitelist">
-        <article class="site" data-region="de">
+        <article class="site" tabindex="0" data-mark="m-go">
           <h3>Göttingen &amp; Witzenhausen <em>51.5° N</em></h3>
           <p>Joint MSc in Sustainable International Agriculture across the Universities of Göttingen and Kassel. Student research assistant on the DFG-funded MultiStress subproject SP2 under Dr Irsa Ejaz, working on hyperspectral imagery cubes, and on the TRIO One Health project.</p>
         </article>
-        <article class="site" data-region="de">
+        <article class="site" tabindex="0" data-mark="m-po">
           <h3>Potsdam <em>52.4° N</em></h3>
           <p>Potsdam Institute for Climate Impact Research. Took the I31 course on sustainable land use and climate mitigation, working directly with the MAgPIE global land-use model.</p>
         </article>
-        <article class="site" data-region="de">
+        <article class="site" tabindex="0" data-mark="m-mu">
           <h3>Müncheberg <em>52.5° N</em></h3>
           <p>ZALF, the Leibniz Centre for Agricultural Landscape Research. Applied for the RSI/ECO position on crop water and nitrogen acquisition under drought, reference 38-2026.</p>
         </article>
-        <article class="site" data-region="pk">
+        <article class="site" tabindex="0" data-mark="m-ml">
           <h3>Multan <em>30.2° N</em></h3>
           <p>Bahauddin Zakariya University. BSc (Hons) in Agriculture, Soil Science. Research assistant on HEC-NRPU project 17027 under Dr Shahid Hussain, modelling multi-element wastewater irrigation kinetics.</p>
         </article>
-        <article class="site" data-region="pk">
+        <article class="site" tabindex="0" data-mark="m-pu">
           <h3>Punjab <em>31.4° N</em></h3>
           <p>Ministry of Agriculture. Internship at the Pesticide Quality Control Laboratory, validating regulatory compliance across 27 coded active ingredients on HPLC and uHPLC platforms.</p>
         </article>
@@ -804,32 +883,17 @@ h1,h2,h3{font-family:var(--serif);font-weight:300;margin:0;font-variation-settin
     });
   });
 
-  /* ---- qualification gates ---- */
-  var track = document.getElementById('gates');
-  if(track){
-    var frag = document.createDocumentFragment();
-    for(var i = 1; i <= 52; i++){
-      var g = document.createElement('span');
-      g.className = 'gate' + (i === 26 ? ' now' : '');
-      frag.appendChild(g);
-    }
-    track.appendChild(frag);
-  }
-
-  /* ---- site pins ---- */
-  var pins = [].slice.call(document.querySelectorAll('.pin'));
-  var siteEls = [].slice.call(document.querySelectorAll('.site'));
-  pins.forEach(function(pin){
-    pin.addEventListener('click', function(){
-      var active = pin.getAttribute('aria-pressed') === 'true';
-      pins.forEach(function(p){ p.setAttribute('aria-pressed','false'); });
-      if(!active) pin.setAttribute('aria-pressed','true');
-      var region = active ? null : pin.dataset.region;
-      siteEls.forEach(function(s){ s.classList.toggle('dim', !!region && s.dataset.region !== region); });
-    });
+  /* ---- hovering a site lights its latitude marker ---- */
+  [].slice.call(document.querySelectorAll('.site')).forEach(function(site){
+    var dot = site.dataset.mark ? document.getElementById(site.dataset.mark) : null;
+    if(!dot) return;
+    function on(){ site.classList.add('hot'); dot.classList.add('hot'); }
+    function off(){ site.classList.remove('hot'); dot.classList.remove('hot'); }
+    site.addEventListener('mouseenter', on);
+    site.addEventListener('mouseleave', off);
+    site.addEventListener('focusin', on);
+    site.addEventListener('focusout', off);
   });
-  var mapimg = document.getElementById('mapimg');
-  if(mapimg) mapimg.addEventListener('error', function(){ document.getElementById('map').style.display = 'none'; });
 
   /* ---- photograph filters ---- */
   var shots = [].slice.call(document.querySelectorAll('.shot'));
